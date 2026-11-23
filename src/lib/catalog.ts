@@ -1,27 +1,26 @@
 import { all, one } from "./db";
-import { SITE_DEFAULTS } from "./site-fields";
+import { SITE_DEFAULTS, SECRET_KEYS } from "./site-fields";
 import { FEATURE_DEFAULTS } from "./features";
 
 export type Settings = Record<string, string>;
 
 export const DEFAULT_SETTINGS: Settings = {
   store_name: "Jasmonoide",
-  tagline: "Materials, moulds & kits for makers",
+  tagline: "Premium candles & casting materials",
   announcement: "Free shipping above ₹999 · Bulk order enquiries on WhatsApp",
   whatsapp: "919999999999",
   email: "hello@example.com",
   phone: "+91 99999 99999",
   address: "Your studio address, City, State, India",
   currency_symbol: "₹",
-  tax_percent: "0",
   shipping_flat: "79",
   free_shipping_min: "999",
   cod_enabled: "1",
   upi_enabled: "1",
   upi_id: "yourname@upi",
   bank_details: "Account name · A/C number · IFSC (placeholder)",
-  hero_title: "Make something worth keeping",
-  hero_text: "Jesmonite, resin, moulds, pigments and finishing — everything for decor and dressing-table pieces.",
+  hero_title: "Light up every moment",
+  hero_text: "Hand-poured premium candles for every mood — and jesmonite, resin and white cement for your own creations.",
   low_stock_default: "5",
   instagram: "https://instagram.com/",
   youtube: "https://youtube.com/",
@@ -36,7 +35,15 @@ export async function getSettings(): Promise<Settings> {
   const rows = await all<{ key: string; value: string }>("select key, value from settings");
   const s = { ...DEFAULT_SETTINGS };
   for (const r of rows) s[r.key] = r.value;
+  // secrets never leave the server: expose only whether they are set
+  for (const k of SECRET_KEYS) { s[k + "_set"] = s[k] || process.env[k.toUpperCase()] ? "1" : "0"; s[k] = ""; }
   return s;
+}
+
+/** Read a secret setting (server-only). Falls back to an env var such as RAZORPAY_KEY_SECRET. */
+export async function getSecret(key: string): Promise<string> {
+  const r = await one<{ value: string }>("select value from settings where key = ?", [key]);
+  return r?.value || process.env[key.toUpperCase()] || "";
 }
 
 /* ---------- pricing ---------- */

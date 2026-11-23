@@ -20,7 +20,7 @@ create table if not exists products (
   sku text default '', stock integer default 0, low_stock integer default 5, track_stock integer default 1,
   status text not null default 'published',       -- published | draft
   featured integer default 0, badge text default '', digital_url text default '',
-  weight_g integer default 0, seo_title text default '', seo_desc text default '',
+  weight_g integer default 0, hsn text default '', seo_title text default '', seo_desc text default '',
   created_at text default (datetime('now')), updated_at text default (datetime('now'))
 );
 create table if not exists variants (
@@ -48,7 +48,13 @@ create table if not exists orders (
   name text, email text, phone text, address text, city text, state text, pincode text,
   subtotal real, discount real default 0, shipping real default 0, tax real default 0, total real,
   coupon_code text default '', payment_method text default 'cod', payment_status text default 'pending',
-  status text default 'pending', tracking text default '', notes text default '', created_at text default (datetime('now'))
+  status text default 'pending', tracking text default '', notes text default '', created_at text default (datetime('now')),
+  delivered_at text, bulk_discount real default 0, bulk_label text default '',
+  payment_ref text default '', paid_at text, shipped_at text, gateway_order_id text default '', gateway_payment_id text default ''
+);
+create table if not exists order_events (
+  id integer primary key autoincrement, order_id integer not null references orders(id) on delete cascade,
+  label text not null, note text default '', created_at text default (datetime('now'))
 );
 create table if not exists order_items (
   id integer primary key autoincrement, order_id integer not null references orders(id) on delete cascade,

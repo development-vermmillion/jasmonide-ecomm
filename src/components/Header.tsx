@@ -37,10 +37,10 @@ export default async function Header() {
         <Link href="/" className="h-serif flex items-center text-2xl font-semibold tracking-tight">
           {s.logo_url ? <img src={s.logo_url} alt={s.store_name} className="h-8 w-auto max-w-[150px] object-contain sm:h-9" /> : s.store_name}
         </Link>
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden min-w-0 items-center gap-3 lg:flex xl:gap-5">
           {cats.slice(0, 7).map((c: any) => (
             <div key={c.id} className="group static">
-              <Link href={`/category/${c.slug}`} className="inline-flex items-center gap-1 py-6 text-sm font-medium hover:text-clay">{c.name}<ChevronDown size={14} className="opacity-50 transition group-hover:rotate-180" /></Link>
+              <Link href={`/category/${c.slug}`} className="inline-flex items-center gap-1 whitespace-nowrap py-6 text-[13px] font-medium hover:text-clay xl:text-sm">{c.name}<ChevronDown size={14} className="opacity-50 transition group-hover:rotate-180" /></Link>
               <div className="invisible absolute left-0 right-0 top-full translate-y-2 border-b border-neutral-200 bg-paper opacity-0 shadow-lg transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
                 <div className="mx-auto grid max-w-7xl grid-cols-4 gap-6 px-6 py-6">
                   <div>

@@ -17,7 +17,7 @@ export default async function Reviews({ productId }: { productId: number }) {
     <section id="reviews" className="mx-auto max-w-7xl scroll-mt-28 px-4 py-10 sm:px-6">
       <Reveal>
         <p className="eyebrow">Reviews</p>
-        <h2 className="h-serif mt-1 text-2xl sm:text-3xl">What makers say</h2>
+        <h2 className="h-serif mt-1 text-2xl sm:text-3xl">What our customers say</h2>
         <div className="mt-6 grid gap-8 lg:grid-cols-3">
           <div className="space-y-4">
             <div className="rounded-xl bg-butter/70 p-5">

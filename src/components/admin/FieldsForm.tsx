@@ -13,7 +13,7 @@ export default function FieldsForm({ groups, initial, canEdit }: { groups: Field
   async function save() {
     const r = await call("/api/admin/settings", "PUT", f);
     setMsg(r.ok ? "Saved ✓ — live on your site now" : r.error);
-    if (r.ok) router.refresh();
+    if (r.ok) { setF((s) => ({ ...s, razorpay_key_secret: "", razorpay_webhook_secret: "" })); router.refresh(); }
   }
   const set = (k: string, v: string) => setF((s) => ({ ...s, [k]: v }));
   return (
@@ -31,6 +31,7 @@ export default function FieldsForm({ groups, initial, canEdit }: { groups: Field
                 <label className="label">{x.label}</label>
                 {x.type === "area" ? <textarea rows={3} className="input" disabled={!canEdit} value={f[x.key] ?? ""} onChange={(e) => set(x.key, e.target.value)} />
                   : x.type === "image" ? <ImageField value={f[x.key] ?? ""} disabled={!canEdit} onChange={(v) => set(x.key, v)} />
+                  : x.type === "secret" ? <input type="password" autoComplete="new-password" className="input" disabled={!canEdit} value={f[x.key] ?? ""} placeholder={initial[x.key + "_set"] === "1" ? "•••••••• saved — type to replace" : "Not set"} onChange={(e) => set(x.key, e.target.value)} />
                   : <input className="input" disabled={!canEdit} value={f[x.key] ?? ""} onChange={(e) => set(x.key, e.target.value)} />}
                 {x.help && <p className="mt-1 text-xs text-neutral-500">{x.help}</p>}
               </div>

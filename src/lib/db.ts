@@ -23,6 +23,7 @@ async function init() {
       const MIGRATIONS: [string, string, string][] = [
         ["customers", "password_hash", "text default ''"], ["customers", "address", "text default ''"], ["customers", "city", "text default ''"],
         ["customers", "state", "text default ''"], ["customers", "pincode", "text default ''"], ["orders", "delivered_at", "text"], ["orders", "bulk_discount", "real default 0"], ["orders", "bulk_label", "text default ''"],
+        ["orders", "payment_ref", "text default ''"], ["orders", "paid_at", "text"], ["orders", "shipped_at", "text"], ["orders", "gateway_order_id", "text default ''"], ["orders", "gateway_payment_id", "text default ''"], ["products", "hsn", "text default ''"],
       ];
       for (const [t, col, def] of MIGRATIONS) {
         const have = (await c.execute(`pragma table_info(${t})`)).rows.map((r: any) => r.name);

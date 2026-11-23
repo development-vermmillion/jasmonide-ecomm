@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { LayoutDashboard, BarChart3, Package, Layers, FolderTree, Warehouse, Percent, ShoppingCart, Users, Ticket, Settings, UserCog, Film, Star, Sparkles, Globe, Home, BookOpen, HelpCircle, Undo2, Inbox, LogOut, ExternalLink, Menu, X } from "lucide-react";
+import { LayoutDashboard, BarChart3, Package, Layers, FolderTree, Warehouse, Percent, ShoppingCart, Users, Ticket, Settings, UserCog, CreditCard, FileText, Film, Star, Sparkles, Globe, Home, BookOpen, HelpCircle, Undo2, Inbox, LogOut, ExternalLink, Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -8,9 +8,9 @@ import ThemeToggle from "@/components/ThemeToggle";
 const NAV = [
   ["Overview", [["/admin", "Dashboard", LayoutDashboard], ["/admin/reports", "Sales reports", BarChart3]]],
   ["Catalogue", [["/admin/products", "Products", Package], ["/admin/products?type=combo", "Combos", Layers], ["/admin/categories", "Categories", FolderTree], ["/admin/inventory", "Inventory & stock", Warehouse], ["/admin/offers", "Sales & offers", Percent], ["/admin/bulk", "Bulk discounts", Layers]]],
-  ["Sales", [["/admin/orders", "Orders", ShoppingCart], ["/admin/customers", "Customers", Users], ["/admin/coupons", "Coupons", Ticket], ["/admin/returns", "Returns & refunds", Undo2]]],
+  ["Sales", [["/admin/orders", "Orders", ShoppingCart], ["/admin/customers", "Customers", Users], ["/admin/coupons", "Coupons", Ticket], ["/admin/payments", "Payments", CreditCard], ["/admin/returns", "Returns & refunds", Undo2]]],
   ["Engagement", [["/admin/reels", "Instagram reels", Film], ["/admin/reviews", "Reviews", Star], ["/admin/assistant", "AI assistant", Sparkles], ["/admin/inbox", "Inbox & leads", Inbox]]],
-  ["Store", [["/admin/homepage", "Homepage content", Home], ["/admin/brand", "Brand, SEO & AI", Globe], ["/admin/blog", "Blog", BookOpen], ["/admin/faqs", "FAQs", HelpCircle], ["/admin/settings", "Settings & switches", Settings], ["/admin/users", "Team & users", UserCog]]],
+  ["Store", [["/admin/homepage", "Homepage content", Home], ["/admin/brand", "Brand, SEO & AI", Globe], ["/admin/blog", "Blog", BookOpen], ["/admin/faqs", "FAQs", HelpCircle], ["/admin/invoice-settings", "Invoice & GST", FileText], ["/admin/settings", "Settings & switches", Settings], ["/admin/users", "Team & users", UserCog]]],
 ] as const;
 
 export default function Sidebar({ name, role, store }: { name: string; role: string; store: string }) {

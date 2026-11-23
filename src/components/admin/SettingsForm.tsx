@@ -9,8 +9,7 @@ import Upl from "./ImageField";
 const GROUPS: [string, [string, string, string?][]][] = [
     ["Contact & social", [["whatsapp", "WhatsApp number (with country code, no +)"], ["phone", "Phone"], ["email", "Email"], ["address", "Address"], ["instagram", "Instagram URL"], ["youtube", "YouTube URL"]]],
   ["Instagram reels & returns", [["reels_title", "Reels section title"], ["reels_handle", "Instagram handle (e.g. @yourbrand)"], ["return_days", "Return window (days after delivery)", "number"], ["maintenance_message", "Maintenance-mode message"]]],
-  ["Shipping & tax", [["shipping_flat", "Flat shipping fee (₹)", "number"], ["free_shipping_min", "Free shipping above (₹)", "number"], ["tax_percent", "Tax % added at checkout", "number"]]],
-  ["Payments", [["upi_id", "UPI ID"], ["bank_details", "Bank details / payment instructions"]]],
+  ["Shipping (GST and payments have their own pages)", [["shipping_flat", "Flat shipping fee (₹)", "number"], ["free_shipping_min", "Free shipping above (₹)", "number"]]],
 ];
 
 export default function SettingsForm({ initial, canEdit }: { initial: Record<string, string>; canEdit: boolean }) {

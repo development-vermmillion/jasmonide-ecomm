@@ -259,10 +259,11 @@ export default function ProductForm({ initial, categories, pool, id }: { initial
                 <Field label="Low-stock alert at"><input type="number" {...inp("low_stock")} /></Field>
                 {isSimple && <Field label="SKU"><input {...inp("sku")} /></Field>}
                 <Field label="Weight (grams)"><input type="number" {...inp("weight_g")} /></Field>
+                <Field label="HSN code (printed on GST invoice)"><input placeholder="e.g. 3406 for candles" {...inp("hsn")} /></Field>
               </div>
             </Section>
           )}
-          {isCombo && <Section title="Inventory"><p className="text-sm text-neutral-600">Combo stock is automatic: it equals the number of full bundles your item stock can make.</p><Field label="SKU" className="mt-3"><input {...inp("sku")} /></Field></Section>}
+          {isCombo && <Section title="Inventory"><p className="text-sm text-neutral-600">Combo stock is automatic: it equals the number of full bundles your item stock can make.</p><Field label="SKU" className="mt-3"><input {...inp("sku")} /></Field><Field label="HSN code (printed on GST invoice)" className="mt-3"><input placeholder="e.g. 3406" {...inp("hsn")} /></Field></Section>}
         </div>
       </div>
     </div>

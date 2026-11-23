@@ -29,7 +29,7 @@ export default function SearchBox() {
     <form ref={box} className="relative hidden md:block" onSubmit={(e) => { e.preventDefault(); setOpen(false); if (q.trim()) router.push(`/shop?q=${encodeURIComponent(q.trim())}`); }}>
       <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
       <input value={q} onChange={(e) => setQ(e.target.value)} onFocus={() => res.length && setOpen(true)} placeholder="Search" aria-label="Search products"
-        className="w-40 rounded-full border border-neutral-300 bg-white/60 py-1.5 pl-9 pr-4 text-sm outline-none transition-all focus:w-64 focus:border-plum" />
+        className="w-28 xl:w-40 rounded-full border border-neutral-300 bg-white/60 py-1.5 pl-9 pr-4 text-sm outline-none transition-all focus:w-48 xl:focus:w-64 focus:border-plum" />
       {open && res.length > 0 && (
         <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-xl">
           {res.map((p) => (

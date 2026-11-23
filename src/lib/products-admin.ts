@@ -42,9 +42,9 @@ export async function saveProduct(b: any, id?: number) {
     price, compare_at, numOrNull(b.sale_price), b.sale_start || null, b.sale_end || null,
     b.sku || "", Math.floor(num(b.stock)), Math.floor(num(b.low_stock, 5)), b.track_stock ? 1 : 0,
     b.status === "draft" ? "draft" : "published", b.featured ? 1 : 0, b.badge || "", b.digital_url || "",
-    Math.floor(num(b.weight_g)), b.seo_title || "", b.seo_desc || "",
+    Math.floor(num(b.weight_g)), b.seo_title || "", b.seo_desc || "", String(b.hsn || "").trim(),
   ];
-  const cols = "type,name,slug,short_desc,spec_line,description,category_id,tags,images,price,compare_at,sale_price,sale_start,sale_end,sku,stock,low_stock,track_stock,status,featured,badge,digital_url,weight_g,seo_title,seo_desc".split(",");
+  const cols = "type,name,slug,short_desc,spec_line,description,category_id,tags,images,price,compare_at,sale_price,sale_start,sale_end,sku,stock,low_stock,track_stock,status,featured,badge,digital_url,weight_g,seo_title,seo_desc,hsn".split(",");
 
   let pid = id!;
   if (id) {

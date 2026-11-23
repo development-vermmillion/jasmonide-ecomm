@@ -101,3 +101,13 @@ customer accounts/wishlist, email/SMS notifications, GST invoice format, shippin
 
 ## Bulk discounts
 Admin → Bulk discounts: automatic discounts by quantity (e.g. 10–20 pcs) or order value, on all products, one category or one product, as % or fixed ₹. Each rule has an On/Off switch and optional dates; the whole feature has a switch in Settings. The best single matching rule applies; coupons work on top. Customers see a "Bulk savings" box on product pages and a "Add 2 more to get 5% off" nudge in the cart.
+
+## v5 — Candles + materials catalogue, payments, orders & invoices
+
+- **Catalogue**: sample data is now premium candles (Jar, Pillar, Jesmonite, Tealights & Floating, Gift Sets) plus Raw Materials (jesmonite, epoxy resin, white cement, pigments). Replace everything from Admin → Products / Categories. Existing databases keep their old data — run `npm run db:reset` to load the new sample catalogue.
+- **Admin → Payments**: turn COD / UPI / Razorpay on or off; set UPI ID, payee name, optional own QR image, bank details, and Razorpay keys. Secrets are never sent to the browser. The "Test Razorpay connection" button checks your keys.
+  - **UPI**: after ordering, the customer sees a QR code with the exact amount pre-filled, a "Pay with UPI app" button, your bank details, and a box for the UTR number. You verify in your bank app and press "Mark payment received" in the order.
+  - **Razorpay**: card/UPI/netbanking popup, server-side signature verification, and a webhook at `/api/payments/razorpay/webhook` (events `payment.captured`, `order.paid`) so orders are marked paid even if the customer closes the tab. Keys can also come from env vars `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET`.
+- **Admin → Orders → open an order**: ordered items with images, SKU and stock, full price breakup (bulk discount, coupon, shipping, GST), customer and lifetime value, delivery address, payment details (UTR / gateway IDs), return request, and a timeline of everything that happened.
+- **Invoice**: `/invoice/<order>?t=<token>` — GST tax invoice with your legal details, GSTIN, HSN per product (set it in the product form), CGST+SGST or IGST by state, tax summary, amount in words, payment details/QR, terms and signature. Customers get it from their order page; admins from the order screen. Print → "Save as PDF". Set your details in **Admin → Invoice & GST**.
+- Prices are treated as GST-inclusive by default (switch in Invoice & GST). Set the correct GST rate and HSN codes with your CA.

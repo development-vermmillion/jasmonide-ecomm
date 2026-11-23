@@ -1,6 +1,7 @@
 import { all, one, run, batch } from "./db";
 import { activeRules, computeBulk } from "./bulk";
 import { getProductById, getSettings, unitPrice, saleActive } from "./catalog";
+import { gatewayReady } from "./payments";
 
 export async function checkCoupon(code: string, subtotal: number) {
   if ((await getSettings()).coupons_enabled !== "1") return { ok: false, discount: 0, message: "Coupons are currently disabled" };
@@ -86,7 +87,8 @@ export async function createOrder(input: {
   const pm = input.payment_method || "cod";
   if (pm === "cod" && (s.cod_enabled !== "1" || !physicalOrder)) throw new Error("Cash on delivery is not available for this order");
   if (pm === "upi" && s.upi_enabled !== "1") throw new Error("UPI payment is not available right now");
-  if (pm !== "cod" && pm !== "upi") throw new Error("Choose a payment method");
+  if (pm === "online" && !(await gatewayReady())) throw new Error("Online payment is not available right now");
+  if (pm !== "cod" && pm !== "upi" && pm !== "online") throw new Error("Choose a payment method");
   const bulk = computeBulk(await activeRules(), lines.map((l) => ({ productId: l.product_id, categoryId: l.category_id, price: l.price, qty: l.qty })));
   let discount = bulk.discount, couponCode = "";
   if (input.coupon) {
@@ -97,8 +99,11 @@ export async function createOrder(input: {
   const physical = lines.some((l) => l.type !== "digital");
   const after = subtotal - discount;
   const shipping = !physical || after >= Number(s.free_shipping_min) ? 0 : Number(s.shipping_flat);
-  const tax = Math.round(after * Number(s.tax_percent)) / 100;
-  const total = after + shipping + tax;
+  const rate = Number(s.tax_percent) || 0;
+  const inclusive = s.tax_inclusive === "1";
+  // inclusive: GST is already inside the prices (shown on the invoice); exclusive: GST is added on top
+  const tax = inclusive ? Math.round((after - after / (1 + rate / 100)) * 100) / 100 : Math.round(after * rate) / 100;
+  const total = Math.round((after + shipping + (inclusive ? 0 : tax)) * 100) / 100;
 
   // customer
   let cust: any = input.customerId ? { id: input.customerId } : null;
@@ -115,6 +120,7 @@ export async function createOrder(input: {
   );
   const number = "JM" + (1000 + o.id);
   await run("update orders set number = ? where id = ?", [number, o.id]);
+  await addEvent(o.id, "Order placed", pm === "cod" ? "Cash on delivery" : pm === "upi" ? "UPI — awaiting payment" : "Online payment — awaiting payment");
   await batch(lines.map((l) => ({
     sql: "insert into order_items (order_id,product_id,variant_id,name,variant_name,sku,price,qty,image,type) values (?,?,?,?,?,?,?,?,?,?)",
     args: [o.id, l.product_id, l.variant_id, l.name, l.variant_name, l.sku, l.price, l.qty, l.image, l.type],
@@ -124,14 +130,29 @@ export async function createOrder(input: {
   return { id: o.id, number, total };
 }
 
+export async function addEvent(orderId: number, label: string, note = "") {
+  await run("insert into order_events (order_id,label,note) values (?,?,?)", [orderId, label, note]);
+}
+
 const CLOSED = ["cancelled", "returned"];
 /** Update an order and keep stock in sync when it moves in/out of cancelled/returned. */
 export async function updateOrder(id: number, patch: any) {
   const cur = await one("select * from orders where id = ?", [id]);
   if (!cur) throw new Error("Order not found");
-  const fields = ["status", "payment_status", "tracking", "notes"].filter((f) => patch[f] !== undefined);
+  const fields = ["status", "payment_status", "tracking", "notes", "payment_ref"].filter((f) => patch[f] !== undefined);
   if (fields.length) await run(`update orders set ${fields.map((f) => f + " = ?").join(", ")} where id = ?`, [...fields.map((f) => patch[f]), id]);
   if (patch.status === "delivered" && !cur.delivered_at) await run("update orders set delivered_at = datetime('now') where id = ?", [id]);
+  if (patch.status === "shipped" && !cur.shipped_at) await run("update orders set shipped_at = datetime('now') where id = ?", [id]);
+  if (patch.status && patch.status !== cur.status) await addEvent(id, `Status: ${patch.status}`, patch.status === "shipped" && (patch.tracking ?? cur.tracking) ? `Tracking ${patch.tracking ?? cur.tracking}` : "");
+  if (patch.payment_status && patch.payment_status !== cur.payment_status) {
+    if (patch.payment_status === "paid" && !cur.paid_at) await run("update orders set paid_at = datetime('now') where id = ?", [id]);
+    await addEvent(id, `Payment: ${patch.payment_status}`, "Updated by admin");
+    if (patch.payment_status === "paid" && cur.status === "pending" && !patch.status) {
+      await run("update orders set status = 'confirmed' where id = ?", [id]);
+      await addEvent(id, "Status: confirmed", "Auto-confirmed on payment");
+    }
+  }
+  if (patch.tracking && patch.tracking !== cur.tracking && !(patch.status && patch.status !== cur.status)) await addEvent(id, "Tracking added", patch.tracking);
   if (patch.status && patch.status !== cur.status) {
     const wasClosed = CLOSED.includes(cur.status), isClosed = CLOSED.includes(patch.status);
     if (wasClosed !== isClosed) {
