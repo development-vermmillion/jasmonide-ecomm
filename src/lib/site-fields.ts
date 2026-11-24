@@ -49,7 +49,8 @@ export const HOME: FieldGroup[] = [
     { key: "hero_text", label: "Sub-text", def: "Candles poured by hand, one small batch at a time — for slow evenings, shared laughter and the people who feel like home.", type: "area" },
     { key: "hero_cta", label: "Button text", def: "Find your glow" },
     { key: "hero_link", label: "Button link", def: "/shop" },
-    { key: "hero_image", label: "Hero image", def: "", type: "image" },
+    { key: "hero_video", label: "Hero video (MP4 link; leave empty to use the image)", def: "/media/hero.mp4", type: "url" },
+    { key: "hero_image", label: "Hero image / video poster", def: "", type: "image" },
   ] },
   { title: "Side promo tiles", fields: [
     { key: "promo1_title", label: "Tile 1 title", def: "Gifts from the heart" }, { key: "promo1_text", label: "Tile 1 text", def: "Hampers that say what words can't" }, { key: "promo1_link", label: "Tile 1 link", def: "/combos" }, { key: "promo1_image", label: "Tile 1 image", def: "", type: "image" },

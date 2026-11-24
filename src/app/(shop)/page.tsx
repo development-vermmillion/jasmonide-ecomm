@@ -37,8 +37,12 @@ export default async function Home() {
     <>
       <section className="mx-auto grid max-w-7xl gap-4 px-4 pt-4 sm:px-6 sm:pt-6 lg:grid-cols-3">
         <Link href={s.hero_link || "/shop"} className="group relative overflow-hidden rounded-2xl lg:col-span-2">
-          <img src={s.hero_image || placeholder("Hero banner", 25)} alt={s.hero_title} className="kenburns h-[380px] w-full object-cover sm:h-[460px]" />
-          <div className="absolute inset-0 bg-[#2d2550]/45" />
+          {s.hero_video ? (
+            <video src={s.hero_video} poster={s.hero_image || "/media/hero-poster.jpg"} autoPlay muted loop playsInline preload="metadata" aria-label={s.hero_title} className="h-[380px] w-full object-cover sm:h-[460px]" />
+          ) : (
+            <img src={s.hero_image || placeholder("Hero banner", 25)} alt={s.hero_title} className="kenburns h-[380px] w-full object-cover sm:h-[460px]" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2a1620]/75 via-[#2a1620]/25 to-transparent" />
           <div className="absolute bottom-0 left-0 max-w-lg p-5 text-white sm:p-10">
             {s.hero_eyebrow && <p style={{ ["--i" as any]: 0 }} className="hero-in text-[11px] font-semibold uppercase tracking-[0.25em] opacity-80">{s.hero_eyebrow}</p>}
             <h1 style={{ ["--i" as any]: 1 }} className="hero-in h-serif mt-2 text-3xl leading-tight sm:text-5xl">{s.hero_title}</h1>
