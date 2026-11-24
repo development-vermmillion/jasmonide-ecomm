@@ -42,35 +42,35 @@ export const ASSISTANT: FieldGroup[] = [
 
 export const HOME: FieldGroup[] = [
   { title: "Hero banner", fields: [
-    { key: "hero_eyebrow", label: "Small label above headline", def: "Small-batch · Hand-poured · Made with love" },
-    { key: "hero_title", label: "Headline", def: "Light a little warmth into every evening" },
-    { key: "hero_text", label: "Sub-text", def: "Candles poured by hand, one small batch at a time — for slow evenings, shared laughter and the people who feel like home.", type: "area" },
-    { key: "hero_cta", label: "Button text", def: "Find your glow" },
+    { key: "hero_eyebrow", label: "Small label above headline", def: "Our first chapter · Hand-poured · Made with love" },
+    { key: "hero_title", label: "Headline", def: "Every glow here began with a dream" },
+    { key: "hero_text", label: "Sub-text", def: "Jasmonoide is my very first brand — candles and jesmonite pieces made by hand, one small batch at a time, for slow evenings and the people who feel like home.", type: "area" },
+    { key: "hero_cta", label: "Button text", def: "Be part of our story" },
     { key: "hero_link", label: "Button link", def: "/shop" },
     { key: "hero_video", label: "Hero video (MP4 link; leave empty to use the image)", def: "/media/hero.mp4", type: "url" },
     { key: "hero_image", label: "Hero image / video poster", def: "", type: "image" },
   ] },
   { title: "Side promo tiles", fields: [
-    { key: "promo1_title", label: "Tile 1 title", def: "Gifts from the heart" }, { key: "promo1_text", label: "Tile 1 text", def: "Hampers that say what words can't" }, { key: "promo1_link", label: "Tile 1 link", def: "/combos" }, { key: "promo1_image", label: "Tile 1 image", def: "", type: "image" },
-    { key: "promo2_title", label: "Tile 2 title", def: "Gentle savings" }, { key: "promo2_text", label: "Tile 2 text", def: "A little extra love, while it lasts" }, { key: "promo2_link", label: "Tile 2 link", def: "/sale" }, { key: "promo2_image", label: "Tile 2 image", def: "", type: "image" },
+    { key: "promo1_title", label: "Tile 1 title", def: "Gifts from the heart" }, { key: "promo1_text", label: "Tile 1 text", def: "Hampers made by hand, with a note from us" }, { key: "promo1_link", label: "Tile 1 link", def: "/combos" }, { key: "promo1_image", label: "Tile 1 image", def: "", type: "image" },
+    { key: "promo2_title", label: "Tile 2 title", def: "A little thank-you" }, { key: "promo2_text", label: "Tile 2 text", def: "Small savings for believing in a small brand" }, { key: "promo2_link", label: "Tile 2 link", def: "/sale" }, { key: "promo2_image", label: "Tile 2 image", def: "", type: "image" },
   ] },
   { title: "Trust strip (4 boxes)", fields: [
     { key: "show_usp", label: "Show this strip", def: "1", type: "toggle" },
-    { key: "usp1_title", label: "Box 1 title", def: "Free shipping" }, { key: "usp1_text", label: "Box 1 text", def: "Above ₹999 · wrapped with care" },
-    { key: "usp2_title", label: "Box 2 title", def: "Made by hand" }, { key: "usp2_text", label: "Box 2 text", def: "Small batches · clean soy wax" },
+    { key: "usp1_title", label: "Box 1 title", def: "Free shipping" }, { key: "usp1_text", label: "Box 1 text", def: "Above ₹999 · wrapped with care by me" },
+    { key: "usp2_title", label: "Box 2 title", def: "Made by hand" }, { key: "usp2_text", label: "Box 2 text", def: "Every piece, never mass-made" },
     { key: "usp3_title", label: "Box 3 title", def: "Pay your way" }, { key: "usp3_text", label: "Box 3 text", def: "Cash on delivery or UPI" },
-    { key: "usp4_title", label: "Box 4 title", def: "A real person" }, { key: "usp4_text", label: "Box 4 text", def: "Say hello on WhatsApp" },
+    { key: "usp4_title", label: "Box 4 title", def: "A real person" }, { key: "usp4_text", label: "Box 4 text", def: "Message me on WhatsApp — I reply myself" },
   ] },
   { title: "Section headings", fields: [
-    { key: "cat_eyebrow", label: "Categories — label", def: "Find your mood" }, { key: "cat_title", label: "Categories — heading", def: "A candle for every moment" }, { key: "show_categories", label: "Show categories", def: "1", type: "toggle" },
-    { key: "new_eyebrow", label: "New arrivals — label", def: "Just poured" }, { key: "new_title", label: "New arrivals — heading", def: "Fresh from our studio" },
-    { key: "sale_eyebrow", label: "Sale rail — label", def: "While they last" }, { key: "sale_title", label: "Sale rail — heading", def: "Gentle savings" },
+    { key: "cat_eyebrow", label: "Categories — label", def: "Find your mood" }, { key: "cat_title", label: "Categories — heading", def: "Something small, made for a big feeling" }, { key: "show_categories", label: "Show categories", def: "1", type: "toggle" },
+    { key: "new_eyebrow", label: "New arrivals — label", def: "Just poured" }, { key: "new_title", label: "New arrivals — heading", def: "Fresh from my little studio" },
+    { key: "sale_eyebrow", label: "Sale rail — label", def: "A thank-you" }, { key: "sale_title", label: "Sale rail — heading", def: "Small savings, big gratitude" },
     { key: "combo_eyebrow", label: "Combos rail — label", def: "Made for gifting" }, { key: "combo_title", label: "Combos rail — heading", def: "Gifts that feel like a hug" },
     { key: "learn_eyebrow", label: "Courses rail — label", def: "Learn" }, { key: "learn_title", label: "Courses rail — heading", def: "E-courses & guides" }, { key: "show_learn", label: "Show courses rail", def: "0", type: "toggle" },
   ] },
   { title: "Inspiration / projects", fields: [
     { key: "show_projects", label: "Show this section", def: "1", type: "toggle" },
-    { key: "proj_eyebrow", label: "Label", def: "Inspiration" }, { key: "proj_title", label: "Heading", def: "Make your home glow" },
+    { key: "proj_eyebrow", label: "Label", def: "Make it yours" }, { key: "proj_title", label: "Heading", def: "Little projects, big joy" },
     { key: "proj1_title", label: "Project 1 title", def: "Setting the table for a festive evening" }, { key: "proj1_image", label: "Project 1 image", def: "", type: "image" }, { key: "proj1_link", label: "Project 1 link (blog post etc.)", def: "/blog" },
     { key: "proj2_title", label: "Project 2 title", def: "A cosy corner just for you" }, { key: "proj2_image", label: "Project 2 image", def: "", type: "image" }, { key: "proj2_link", label: "Project 2 link", def: "/blog" },
     { key: "proj3_title", label: "Project 3 title", def: "Pour your very first jesmonite vessel" }, { key: "proj3_image", label: "Project 3 image", def: "", type: "image" }, { key: "proj3_link", label: "Project 3 link", def: "/blog" },
@@ -88,8 +88,8 @@ export const HOME: FieldGroup[] = [
   ] },
   { title: "Brand story", fields: [
     { key: "show_story", label: "Show this section", def: "1", type: "toggle" },
-    { key: "story_title", label: "Heading", def: "Made slowly, for the moments that matter" },
-    { key: "story_text", label: "Text", def: "Jasmonoide is a brand-new studio built on a simple belief: the smallest rituals — a lit candle, a quiet evening, a gift chosen with care — are the ones we remember. Every piece is poured by hand in small batches, because we would rather make fewer things with more love. You are not just buying a candle; you are becoming part of our very first chapter, and we are so grateful you are here.", type: "area" },
+    { key: "story_title", label: "Heading", def: "Our promise to you" },
+    { key: "story_text", label: "Text", def: "Because this is a one-person dream, every order matters to me more than I can say. I promise to make each piece with patience, to pack it with care, to answer you like a friend, and to make it right if anything ever goes wrong. You are not a customer to us — you are the reason this hustle keeps going.", type: "area" },
     { key: "stat1_n", label: "Stat 1 number", def: "100%" }, { key: "stat1_l", label: "Stat 1 label", def: "hand-poured" },
     { key: "stat2_n", label: "Stat 2 number", def: "40+ hrs" }, { key: "stat2_l", label: "Stat 2 label", def: "of slow, clean burn*" },
     { key: "stat3_n", label: "Stat 3 number", def: "7 days" }, { key: "stat3_l", label: "Stat 3 label", def: "easy returns" },
@@ -100,10 +100,10 @@ export const HOME: FieldGroup[] = [
     { key: "press_names", label: "Press names (comma separated)", def: "PressLogo, DailyCraft, MakerWeekly" },
   ] },
   { title: "Top bar & footer", fields: [
-    { key: "announcement", label: "Announcement bar text", def: "Free shipping above ₹999 · Every order is packed by hand, with love" },
-    { key: "footer_about", label: "Footer about text", def: "Hand-poured candles and handmade décor, made in small batches to turn ordinary evenings into memories. Thank you for being part of our first chapter.", type: "area" },
+    { key: "announcement", label: "Announcement bar text", def: "Free shipping above ₹999 · Every order is packed by hand, with love · Thank you for backing a first-time maker" },
+    { key: "footer_about", label: "Footer about text", def: "Jasmonoide is a first-time dream: hand-poured candles and jesmonite pieces made in small batches, with a lot of heart. Thank you for being part of our first chapter.", type: "area" },
     { key: "newsletter_title", label: "Newsletter heading", def: "Join our candle circle" },
-    { key: "newsletter_text", label: "Newsletter text", def: "Be the first to hear about new scents and little stories from the studio. No spam — only warmth." },
+    { key: "newsletter_text", label: "Newsletter text", def: "Follow the journey — new pours, behind-the-scenes struggles and little wins from the studio. No spam, only warmth." },
   ] },
 ];
 
@@ -268,7 +268,7 @@ export const MARKETING: FieldGroup[] = [
   ] },
   { title: "Instagram feed on the homepage", note: "Without an access token, the feed shows your latest reels from Admin → Instagram reels. With a token it shows your real latest Instagram posts. Token: Meta developers → Instagram API → generate a long-lived token for your professional account.", fields: [
     { key: "show_ig_feed", label: "Show Instagram feed on the homepage", def: "1", type: "toggle" },
-    { key: "ig_feed_title", label: "Heading", def: "Follow our little studio" },
+    { key: "ig_feed_title", label: "Heading", def: "Follow the journey, one pour at a time" },
     { key: "ig_user_id", label: "Instagram user ID (for live feed)", def: "" },
     { key: "ig_access_token", label: "Instagram access token (for live feed)", def: "", type: "secret" },
   ] },
