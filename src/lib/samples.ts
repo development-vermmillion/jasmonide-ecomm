@@ -15,6 +15,19 @@ const POOLS: Record<string, string[]> = {
   mood: ["HAeY_hnc1YU", "jBK-A0Jm71Y", "P7-jciwqmc0", "a6RhrlYuGAA", "GVGBs3oN6pg", "B5AmTy1K6mk"],
 };
 
+export type SampleKind = "jar" | "vessel" | "pillar" | "float" | "gift" | "material" | "hero" | "mood";
+export function sampleKind(label: string): SampleKind {
+  const l = (label || "").toLowerCase();
+  if (/hero|banner/.test(l)) return "hero";
+  if (/\bkit\b|epoxy|resin|cement|pigment|mica|raw material|powder|material|casting/.test(l)) return "material";
+  if (/jesmonite|terrazzo|concrete|sandstone|vessel/.test(l)) return "vessel";
+  if (/pillar|ivory|marble|ribbed/.test(l)) return "pillar";
+  if (/tealight|floating|diya|rose/.test(l)) return "float";
+  if (/gift|combo|hamper|trio|unwind|bundle|\bset\b/.test(l)) return "gift";
+  if (/candle|jar|soy|wax|vanilla|lavender|amber|oud|sea salt/.test(l)) return "jar";
+  return "mood";
+}
+
 function pick(label: string): string[] {
   const l = label.toLowerCase();
   if (/hero|banner/.test(l)) return POOLS.hero;
