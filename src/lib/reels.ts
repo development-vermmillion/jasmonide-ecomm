@@ -1,5 +1,5 @@
 import { all } from "./db";
-import { getSettings, placeholder } from "./catalog";
+import { getSettings, placeholder, bust } from "./catalog";
 
 /** Convert an Instagram reel/post URL to its embeddable URL. */
 export function instagramEmbed(url?: string | null) {
@@ -24,10 +24,10 @@ export async function getReels(o: { home?: boolean; productId?: number; limit?: 
      where ${where.join(" and ")} order by r.sort, r.id desc limit ${o.limit || 24}`, args);
   return rows.map((r: any) => {
     let img = "";
-    try { img = JSON.parse(r.pimages || "[]")[0] || ""; } catch {}
+    try { img = bust(JSON.parse(r.pimages || "[]")[0] || ""); } catch {}
     return {
       id: r.id, title: r.title || r.pname || "Reel", url: r.url, embed: instagramEmbed(r.url),
-      thumb: r.thumb || img || placeholder(r.title || r.pname || "Reel", (r.id * 47) % 360), video: r.video_url || "",
+      thumb: bust(r.thumb || "") || img || placeholder(r.title || r.pname || "Reel", (r.id * 47) % 360), video: r.video_url || "",
       product: r.pname && r.pstatus === "published" ? { id: r.product_id, name: r.pname, slug: r.pslug, price: r.pprice, image: img || placeholder(r.pname), type: r.ptype, in_stock: true } : null,
     };
   });

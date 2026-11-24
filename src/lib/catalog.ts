@@ -61,17 +61,20 @@ export function unitPrice(o: any) {
   return saleActive(o) ? Number(o.sale_price) : Number(o.price);
 }
 
+/** Placeholder URLs carry a version so browsers never reuse an older cached picture. */
+export const bust = (u: string) => (u && u.startsWith("/api/ph") && !u.includes("&v=") ? u + "&v=3" : u);
+
 export function images(p: any): string[] {
   try {
     const a = JSON.parse(p.images || "[]");
-    return a.length ? a : [placeholder(p.name)];
+    return a.length ? a.map(bust) : [placeholder(p.name)];
   } catch {
     return [placeholder(p.name)];
   }
 }
 export function placeholder(label: string, hue?: number) {
   const h = hue ?? [...(label || "x")].reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
-  return `/api/ph?t=${encodeURIComponent(label || "")}&h=${h}`;
+  return `/api/ph?t=${encodeURIComponent(label || "")}&h=${h}&v=3`;
 }
 
 /* ---------- hydration ---------- */
@@ -205,8 +208,8 @@ export async function getProductById(id: number) {
   );
   return row ? (await hydrate([row]))[0] : null;
 }
-export const getCategories = () =>
-  all(`select c.*, (select count(*) from products p where p.category_id = c.id and p.status='published') as product_count from categories c order by sort, name`);
+export const getCategories = async () =>
+  (await all(`select c.*, (select count(*) from products p where p.category_id = c.id and p.status='published') as product_count from categories c order by sort, name`)).map((c: any) => ({ ...c, image: bust(c.image || "") }));
 
 /** Products selectable inside a combo (simple + variable), with their variants. */
 export async function comboPool() {
