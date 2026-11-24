@@ -42,7 +42,7 @@ export function StatusBadge({ s }: { s: string }) {
 export function Switch({ on, onChange, disabled, label }: { on: boolean; onChange: (v: boolean) => void; disabled?: boolean; label?: string }) {
   return (
     <button type="button" role="switch" aria-checked={on} aria-label={label} disabled={disabled} onClick={() => onChange(!on)}
-      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${on ? "bg-green-500" : "bg-neutral-300"}`}>
+      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${on ? "bg-plum" : "bg-neutral-300"}`}>
       <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${on ? "translate-x-5" : "translate-x-0.5"}`} />
     </button>
   );
@@ -61,7 +61,7 @@ export function QuickSwitch({ kind, id, on, onLabel = "Active", offLabel = "Draf
         setBusy(false);
         if (!r.ok) { setV(!n); window.alert(r.error || "Failed"); } else router.refresh();
       }} />
-      <span className={`text-xs ${v ? "text-green-700" : "text-neutral-500"}`}>{v ? onLabel : offLabel}</span>
+      <span className={`text-xs ${v ? "text-plum" : "text-neutral-500"}`}>{v ? onLabel : offLabel}</span>
     </span>
   );
 }

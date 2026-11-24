@@ -21,7 +21,7 @@ export function RevenueChart({ data }: { data: { date: string; revenue: number; 
       ))}
       {data.map((d, i) => (
         <g key={d.date}>
-          <rect x={P.l + i * bw + bw * 0.15} y={y(d.revenue)} width={bw * 0.7} height={Math.max(0, H - P.b - y(d.revenue))} rx="2" fill="#8E7CC3" opacity={d.revenue ? 0.9 : 0.15}>
+          <rect x={P.l + i * bw + bw * 0.15} y={y(d.revenue)} width={bw * 0.7} height={Math.max(0, H - P.b - y(d.revenue))} rx="2" fill="#f24a0d" opacity={d.revenue ? 0.9 : 0.15}>
             <title>{`${d.date}: ${inr(d.revenue)} · ${d.orders} orders`}</title>
           </rect>
           {i % step === 0 && <text x={P.l + i * bw + bw / 2} y={H - 8} textAnchor="middle" fontSize="10" fill="#888">{d.date.slice(5)}</text>}
@@ -31,7 +31,7 @@ export function RevenueChart({ data }: { data: { date: string; revenue: number; 
   );
 }
 
-const BAR = ["#8E7CC3", "#F2A6B3", "#7FC8A9", "#F6C177", "#7DB9E8", "#F4A988"];
+const BAR = ["#f24a0d", "#2b2b30", "#6b6b73", "#a0a0a8", "#c9c9cf", "#dcdce0"];
 
 export function HBars({ rows, money = true }: { rows: { label: string; value: number; sub?: string }[]; money?: boolean }) {
   const max = Math.max(1, ...rows.map((r) => r.value));
@@ -48,19 +48,16 @@ export function HBars({ rows, money = true }: { rows: { label: string; value: nu
   );
 }
 
-export function Kpi({ label, value, delta, hint, tone = "" }: { label: string; value: string; delta?: number | null; hint?: string; tone?: string }) {
+export function Kpi({ label, value, delta, hint }: { label: string; value: string; delta?: number | null; hint?: string; tone?: string }) {
   const Icon = KPI_ICONS[label];
   return (
-    <div className={`card border-white/60 p-4 ${tone}`}>
+    <div className="card lift p-4 sm:p-5">
       <div className="flex items-start justify-between gap-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-neutral-600">{label}</p>
-        {Icon && <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/80 text-plum"><Icon size={16} /></span>}
+        <p className="text-[13px] text-[var(--adm-muted)]">{label}</p>
+        {delta != null ? <span className="chip">{delta >= 0 ? <ArrowUp size={11} /> : <ArrowDown size={11} />}{Math.abs(delta).toFixed(1)}%</span> : Icon ? <Icon size={15} className="text-[var(--adm-muted)]" /> : null}
       </div>
-      <p className="mt-2 text-2xl font-semibold tracking-tight">{value}</p>
-      <p className="mt-1 flex items-center gap-1 text-xs">
-        {delta != null && <span className={`inline-flex items-center ${delta >= 0 ? "text-green-700" : "text-red-600"}`}>{delta >= 0 ? <ArrowUp size={12} /> : <ArrowDown size={12} />}{Math.abs(delta).toFixed(0)}%</span>}
-        <span className="text-neutral-500">{hint}</span>
-      </p>
+      <p className="mt-3 text-[26px] font-semibold leading-none tracking-tight">{value}</p>
+      {hint && <p className="mt-2 text-[11.5px] text-[var(--adm-muted)]">{hint}</p>}
     </div>
   );
 }

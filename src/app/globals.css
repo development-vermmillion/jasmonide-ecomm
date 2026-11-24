@@ -70,3 +70,73 @@ body { overflow-x: clip; background: rgb(var(--c-paper)); color: rgb(var(--c-ink
 }
 
 @keyframes fadeIn { from { opacity: 0; transform: scale(1.02); } to { opacity: 1; transform: none; } }
+
+/* =====================================================================
+   ADMIN THEME  (scoped to .adm — storefront is untouched)
+   Warm-grey canvas, white rounded cards, black pill buttons, orange accent
+   ===================================================================== */
+.adm {
+  --c-paper: 243 243 245; --c-ink: 17 17 20; --c-plum: 242 74 13; --c-surface: 255 255 255; --c-stone: 238 238 241;
+  --c-lilac: 255 238 230; --c-peach: 255 236 226; --c-blush: 254 228 224; --c-mint: 223 243 232; --c-butter: 255 240 205; --c-sky: 228 237 248;
+  --adm-line: rgb(17 17 20 / .07); --adm-muted: rgb(17 17 20 / .5); --adm-accent: #f24a0d; --adm-accent-soft: rgb(242 74 13 / .1);
+  --adm-shadow: 0 1px 2px rgb(16 16 20 / .04), 0 10px 28px -14px rgb(16 16 20 / .12);
+  background: rgb(var(--c-paper)); color: rgb(var(--c-ink));
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-feature-settings: "cv11", "ss01", "tnum"; letter-spacing: -0.005em;
+}
+.dark .adm {
+  --c-paper: 14 14 17; --c-ink: 240 240 243; --c-plum: 255 104 56; --c-surface: 26 26 31; --c-stone: 38 38 45;
+  --c-lilac: 58 33 26; --c-peach: 58 36 28; --c-blush: 64 32 32; --c-mint: 30 58 44; --c-butter: 62 54 28; --c-sky: 30 44 64;
+  --adm-line: rgb(255 255 255 / .09); --adm-muted: rgb(255 255 255 / .5); --adm-accent: #ff6838; --adm-accent-soft: rgb(255 104 56 / .16);
+  --adm-shadow: 0 1px 2px rgb(0 0 0 / .3), 0 10px 28px -14px rgb(0 0 0 / .6);
+}
+.adm .h-serif { font-family: inherit; font-weight: 600; letter-spacing: -0.03em; }
+.adm .card { border-radius: 18px; border: 1px solid var(--adm-line); background: rgb(var(--c-surface)); box-shadow: var(--adm-shadow); transition: box-shadow .3s, transform .3s, border-color .3s; }
+.adm .card.lift:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgb(16 16 20 / .05), 0 18px 36px -16px rgb(16 16 20 / .2); }
+.adm .btn { background: rgb(17 17 20); color: #fff; padding: .55rem 1.1rem; box-shadow: 0 1px 0 rgb(255 255 255 / .12) inset, 0 4px 12px -6px rgb(0 0 0 / .5); }
+.adm .btn:hover { background: #000; transform: translateY(-1px); }
+.dark .adm .btn { background: #fff; color: #111 !important; }
+.dark .adm .btn:hover { background: #eee; }
+.adm .btn-outline { background: rgb(var(--c-surface)); border-color: var(--adm-line); padding: .55rem 1.1rem; }
+.adm .btn-outline:hover { border-color: var(--adm-accent); color: var(--adm-accent); }
+.adm .btn-clay { background: var(--adm-accent); }
+.adm .input, .adm select.input, .adm textarea.input { border-radius: 12px; border-color: var(--adm-line); background: rgb(var(--c-surface)); }
+.adm .input:focus { border-color: var(--adm-accent); box-shadow: 0 0 0 4px var(--adm-accent-soft); --tw-ring-shadow: 0 0 #0000; }
+.adm .label { color: var(--adm-muted); font-weight: 500; }
+.adm .border-neutral-200, .adm .border-neutral-300 { border-color: var(--adm-line); }
+.adm .divide-neutral-100 > :not([hidden]) ~ :not([hidden]), .adm .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--adm-line); }
+.adm .th { color: var(--adm-muted); letter-spacing: .04em; font-weight: 500; }
+.adm tbody tr { transition: background-color .15s; }
+.adm tbody tr:hover { background-color: rgb(var(--c-ink) / .025); }
+.adm .badge { padding: .15rem .6rem; font-weight: 500; }
+.adm ::selection { background: var(--adm-accent-soft); }
+.adm select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23888' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .75rem center; padding-right: 2rem; }
+
+/* chips, segmented control, tabs */
+.adm .chip { display: inline-flex; align-items: center; gap: 3px; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 500; background: rgb(var(--c-ink) / .06); }
+.adm .chip.up { background: rgb(var(--c-ink) / .06); }
+.adm .chip.warn { background: var(--adm-accent-soft); color: var(--adm-accent); }
+.adm .seg { display: inline-flex; gap: 2px; border-radius: 999px; background: rgb(var(--c-ink) / .06); padding: 3px; font-size: 13px; }
+.adm .seg > * { border-radius: 999px; padding: 4px 13px; color: var(--adm-muted); transition: background-color .2s, color .2s, box-shadow .2s; cursor: pointer; }
+.adm .seg > *:hover { color: rgb(var(--c-ink)); }
+.adm .seg > .on { background: rgb(var(--c-surface)); color: rgb(var(--c-ink)); box-shadow: 0 1px 3px rgb(0 0 0 / .12); font-weight: 500; }
+.adm .crumb { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; border: 1px solid var(--adm-line); background: rgb(var(--c-surface)); padding: 5px 12px; font-size: 12.5px; color: var(--adm-muted); }
+
+/* ---- motion ---- */
+@keyframes adm-rise { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes adm-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes adm-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes adm-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes adm-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes adm-slide { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes adm-tip { from { opacity: 0; transform: translateY(4px) scale(.97); } to { opacity: 1; transform: none; } }
+.adm-page > * > * { animation: adm-rise .55s cubic-bezier(.2,.7,.2,1) both; }
+.adm-page > * > *:nth-child(2) { animation-delay: .05s; } .adm-page > * > *:nth-child(3) { animation-delay: .1s; } .adm-page > * > *:nth-child(4) { animation-delay: .15s; } .adm-page > * > *:nth-child(5) { animation-delay: .2s; } .adm-page > * > *:nth-child(n+6) { animation-delay: .25s; }
+.rise { animation: adm-rise .6s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+.draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: adm-draw 1.4s cubic-bezier(.4,0,.2,1) .15s forwards; }
+.fade-in { animation: adm-fade .9s ease .5s both; }
+.bar-in { transform-origin: bottom; animation: adm-grow .7s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 45ms + 150ms); }
+.pop { animation: adm-pop .45s cubic-bezier(.3,1.4,.5,1) both; animation-delay: calc(var(--i, 0) * 6ms + 200ms); }
+.slide-in { animation: adm-slide .38s cubic-bezier(.2,.8,.2,1) both; }
+.tip-in { animation: adm-tip .16s ease both; }
+@media (prefers-reduced-motion: reduce) { .adm-page > * > *, .rise, .draw, .fade-in, .bar-in, .pop, .slide-in, .tip-in { animation: none !important; stroke-dashoffset: 0 !important; opacity: 1 !important; } }

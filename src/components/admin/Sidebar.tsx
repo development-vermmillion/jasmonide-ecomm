@@ -13,7 +13,7 @@ const NAV = [
   ["Store", [["/admin/homepage", "Homepage content", Home], ["/admin/brand", "Brand, SEO & AI", Globe], ["/admin/blog", "Blog", BookOpen], ["/admin/faqs", "FAQs", HelpCircle], ["/admin/invoice-settings", "Invoice & GST", FileText], ["/admin/settings", "Settings & switches", Settings], ["/admin/users", "Team & users", UserCog]]],
 ] as const;
 
-export default function Sidebar({ name, role, store }: { name: string; role: string; store: string }) {
+export default function Sidebar({ name, role, store, logo, counts }: { name: string; role: string; store: string; logo?: string; counts: Record<string, number> }) {
   const path = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -24,37 +24,49 @@ export default function Sidebar({ name, role, store }: { name: string; role: str
   };
   const body = (
     <div className="flex h-full flex-col">
-      <div className="px-5 py-5"><p className="h-serif text-xl font-semibold">{store}</p><p className="text-[11px] uppercase tracking-widest text-neutral-400">Admin</p></div>
-      <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-4">
+      <div className="flex items-center gap-3 px-5 pb-3 pt-5">
+        {logo ? <img src={logo} alt="" className="h-10 w-10 rounded-full border border-[var(--adm-line)] object-cover" /> : <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgb(17_17_20)] text-sm font-semibold text-white dark:bg-white dark:text-black">{(store || "J")[0]}</span>}
+        <div className="min-w-0"><p className="truncate text-[15px] font-semibold leading-tight tracking-tight">{store}</p><p className="text-[11px] text-[var(--adm-muted)]">Admin workspace</p></div>
+        <button className="ml-auto lg:hidden" onClick={() => setOpen(false)} aria-label="Close"><X size={20} /></button>
+      </div>
+      <div className="mx-5 border-t border-[var(--adm-line)]" />
+      <nav className="no-scrollbar flex-1 space-y-4 overflow-y-auto px-3 py-4">
         {NAV.map(([group, links]) => (
           <div key={group}>
-            <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-neutral-400">{group}</p>
-            {links.map(([href, label, Icon]) => (
-              <Link key={href} href={href} onClick={() => setOpen(false)}
-                className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm ${active(href) ? "bg-plum text-white" : "text-neutral-700 hover:bg-white/70"}`}>
-                <Icon size={17} className="shrink-0" />{label}
-              </Link>
-            ))}
+            <p className="px-3 pb-1.5 text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--adm-muted)]">{group}</p>
+            {links.map(([href, label, Icon]) => {
+              const on = active(href), n = counts[href.split("?")[0]] || 0;
+              return (
+                <Link key={href} href={href} onClick={() => setOpen(false)}
+                  className={`group relative flex items-center gap-3 rounded-xl px-3 py-[9px] text-[14px] transition-all duration-200 ${on ? "bg-[#f1ede6] font-medium text-[rgb(var(--c-ink))] dark:bg-white/10" : "text-[rgb(var(--c-ink)/.72)] hover:bg-[rgb(var(--c-ink)/.045)] hover:text-[rgb(var(--c-ink))]"}`}>
+                  {on && <span className="absolute -left-3 top-2 bottom-2 w-[3px] rounded-r-full bg-[var(--adm-accent)]" />}
+                  <Icon size={17} className={`shrink-0 transition-transform duration-200 group-hover:scale-110 ${on ? "text-[var(--adm-accent)]" : ""}`} />
+                  <span className="truncate">{label}</span>
+                  {n > 0 && <span className="ml-auto rounded-full bg-[rgb(var(--c-ink)/.08)] px-2 py-px text-[11px] font-medium">{n}</span>}
+                </Link>
+              );
+            })}
           </div>
         ))}
       </nav>
-      <div className="border-t border-neutral-200 p-4 text-sm">
-        <div className="flex items-center justify-between"><div><p className="font-medium">{name}</p><p className="text-xs capitalize text-neutral-500">{role}</p></div><ThemeToggle /></div>
-        <div className="mt-2 flex gap-3 text-xs">
-          <a href="/" target="_blank" className="inline-flex items-center gap-1 underline"><ExternalLink size={13} />View store</a>
-          <button className="inline-flex items-center gap-1 underline" onClick={async () => { await fetch("/api/auth/logout", { method: "POST" }); router.push("/admin/login"); router.refresh(); }}><LogOut size={13} />Sign out</button>
+      <div className="m-3 rounded-2xl bg-[rgb(var(--c-ink)/.04)] p-3">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--adm-accent-soft)] text-sm font-semibold text-[var(--adm-accent)]">{(name || "A")[0]}</span>
+          <div className="min-w-0 flex-1"><p className="truncate text-[13px] font-medium">{name}</p><p className="text-[11px] capitalize text-[var(--adm-muted)]">{role}</p></div>
+          <button title="Sign out" aria-label="Sign out" className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-[rgb(var(--c-ink)/.08)]"
+            onClick={async () => { await fetch("/api/auth/logout", { method: "POST" }); router.push("/admin/login"); router.refresh(); }}><LogOut size={15} /></button>
         </div>
       </div>
     </div>
   );
   return (
     <>
-      <div className="no-print sticky top-0 z-30 flex items-center justify-between border-b border-neutral-200 bg-lilac/70 px-4 py-3 lg:hidden">
-        <p className="h-serif text-lg font-semibold">{store} · Admin</p>
-        <button onClick={() => setOpen(true)} aria-label="Menu"><Menu size={24} /></button>
+      <div className="no-print sticky top-0 z-30 flex items-center justify-between border-b border-[var(--adm-line)] bg-[rgb(var(--c-paper)/.85)] px-4 py-3 backdrop-blur lg:hidden">
+        <p className="text-base font-semibold tracking-tight">{store} <span className="font-normal text-[var(--adm-muted)]">· Admin</span></p>
+        <div className="flex items-center gap-1"><ThemeToggle /><button onClick={() => setOpen(true)} aria-label="Menu" className="flex h-9 w-9 items-center justify-center"><Menu size={22} /></button></div>
       </div>
-      {open && <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setOpen(false)} />}
-      <aside className={`no-print fixed inset-y-0 left-0 z-50 w-64 border-r border-neutral-200 bg-lilac/60 transition-transform lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>{body}</aside>
+      <div className={`fixed inset-0 z-40 bg-black/30 backdrop-blur-[2px] transition-opacity duration-300 lg:hidden ${open ? "opacity-100" : "pointer-events-none opacity-0"}`} onClick={() => setOpen(false)} />
+      <aside className={`no-print fixed bottom-3 left-3 top-3 z-50 w-[248px] rounded-[22px] border border-[var(--adm-line)] bg-[rgb(var(--c-surface))] shadow-[var(--adm-shadow)] transition-transform duration-300 ease-out lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-[120%]"}`}>{body}</aside>
     </>
   );
 }
