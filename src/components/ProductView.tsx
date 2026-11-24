@@ -6,6 +6,9 @@ import { useCart } from "./cart";
 import TrackEvent from "./TrackEvent";
 import { HeartButton } from "./wishlist";
 import NotifyForm from "./NotifyForm";
+import PincodeCheck from "./PincodeCheck";
+import SubscribeBox from "./SubscribeBox";
+import { ins } from "@/lib/insights-client";
 import { WhatsAppIcon } from "./social";
 import { inr } from "@/lib/util";
 
@@ -19,13 +22,14 @@ function saleOn(o: any, p: any) {
   return true;
 }
 
-export default function ProductView({ p, whatsapp, waOrder, shipNote, children }: { p: any; whatsapp: string; waOrder?: { text: string; store: string } | null; shipNote?: string; children: React.ReactNode }) {
+export default function ProductView({ p, whatsapp, waOrder, shipNote, pincode, subs, children }: { p: any; whatsapp: string; waOrder?: { text: string; store: string } | null; shipNote?: string; pincode?: boolean; subs?: { discount: number; intervals: number[] } | null; children: React.ReactNode }) {
   const { add } = useCart();
   const router = useRouter();
   const [img, setImg] = useState(0);
   const [qty, setQty] = useState(1);
   const [vid, setVid] = useState<number | null>(null);
   const [err, setErr] = useState("");
+  useEffect(() => { ins("product", { product_id: p.id }); }, [p.id]);
   const [copied, setCopied] = useState(false);
   const cta = useRef<HTMLDivElement>(null);
   const [stick, setStick] = useState(false);
@@ -138,6 +142,8 @@ export default function ProductView({ p, whatsapp, waOrder, shipNote, children }
 
         {waOrder && <a href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(waOrder.text.replace("{store}", waOrder.store).replace("{product}", p.name).replace("{link}", typeof window !== "undefined" ? location.href : ""))}`} target="_blank" className="btn-outline mt-3 w-full"><WhatsAppIcon size={16} className="text-[#25D366]" /> Order on WhatsApp</a>}
         {shipNote && <p className="mt-3 text-xs text-neutral-500">🚚 {shipNote}</p>}
+        {pincode && p.type !== "digital" && <PincodeCheck />}
+        {subs && p.type !== "digital" && p.type !== "combo" && <SubscribeBox productId={p.id} variantId={v?.id ?? null} qty={qty} discount={subs.discount} intervals={subs.intervals} disabled={out || needVariant} />}
         <a href={`https://wa.me/${whatsapp}?text=${encodeURIComponent("Hi, I have a question about " + p.name)}`} target="_blank" className="mt-5 inline-flex items-center gap-2 text-sm underline underline-offset-4">
           <WhatsAppIcon size={16} className="text-[#25D366]" /> Questions or bulk order? Chat on WhatsApp
         </a>

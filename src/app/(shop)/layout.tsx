@@ -7,6 +7,8 @@ import AssistantWidget from "@/components/AssistantWidget";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Tracker from "@/components/Tracker";
+import Insights from "@/components/Insights";
+import PwaRegister from "@/components/PwaRegister";
 import CookieBanner from "@/components/CookieBanner";
 import { getSettings } from "@/lib/catalog";
 import { cookies } from "next/headers";
@@ -16,6 +18,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {
   const s = await getSettings();
+  import("@/lib/jobs").then((j) => j.maybeRunJobs()).catch(() => {});
   const isAdmin = !!cookies().get("admin_session")?.value;
   if (s.maintenance_mode === "1" && !isAdmin)
     return (
@@ -35,6 +38,8 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
         <CartDrawer freeMin={Number(s.free_shipping_min)} />
         <ScrollExtras />
         <Tracker />
+        <Insights />
+        <PwaRegister />
         {s.cookie_banner_enabled === "1" && <CookieBanner text={s.cookie_banner_text} />}
         {s.assistant_enabled === "1" && <AssistantWidget name={s.assistant_name} greeting={s.assistant_greeting} />}
         {s.whatsapp_button === "1" && (

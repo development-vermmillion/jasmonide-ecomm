@@ -22,6 +22,7 @@ export default function Tracker() {
           if (h !== location.hostname.replace(/^www\./, "")) { source = HOSTS.find(([re]) => re.test(h))?.[1] || "referral:" + h; medium = medium || "referral"; }
         } catch {}
       }
+      const rf = (q.get("ref") || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12); if (rf) localStorage.setItem("ref", rf);
       const explicit = !!source;
       if (!source) source = "direct";
       const has = document.cookie.split("; ").some((c) => c.startsWith("src="));

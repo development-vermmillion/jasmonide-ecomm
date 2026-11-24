@@ -214,6 +214,21 @@ export const INTEGRATIONS: FieldGroup[] = [
     { key: "shipping_flat", label: "Flat shipping charge (₹)", def: "79" },
     { key: "free_shipping_min", label: "Free shipping above (₹)", def: "999" },
   ] },
+  { title: "Delivery & pincodes", note: "Customers can check any pincode on a product page. Leave blocked list empty to deliver everywhere in India.", fields: [
+    { key: "pincode_check_enabled", label: "Show “Check delivery” pincode box on product pages", def: "1", type: "toggle" },
+    { key: "delivery_default_days", label: "Normal delivery time after dispatch (days, e.g. 3-7)", def: "3-7" },
+    { key: "handling_days", label: "Packing/dispatch time (days)", def: "2" },
+    { key: "delivery_zones", label: "Faster/slower zones — one per line: pincode starts = min-max days", def: "110,400,560,600,700,500,411,380: 2-4\n78,79,19,18: 6-10", type: "area", rows: 3, help: "Example: “110,400: 2-4” means pincodes starting 110 or 400 take 2–4 days." },
+    { key: "blocked_pincodes", label: "Pincodes we do NOT deliver to (starts-with, comma separated)", def: "" },
+    { key: "cod_blocked_pincodes", label: "Pincodes where Cash on delivery is NOT available", def: "" },
+  ] },
+  { title: "Order updates to customers", note: "Automatic email / WhatsApp when an order is confirmed, shipped, delivered or cancelled. Needs Email or WhatsApp set up above.", fields: [
+    { key: "notify_status_email", label: "Email customers on order status changes", def: "1", type: "toggle" },
+    { key: "notify_status_whatsapp", label: "WhatsApp customers on order status changes", def: "0", type: "toggle" },
+    { key: "notify_restock_email", label: "Email “notify me” subscribers when a product is back in stock", def: "1", type: "toggle" },
+    { key: "notify_restock_whatsapp", label: "WhatsApp “notify me” subscribers when back in stock", def: "0", type: "toggle" },
+    { key: "customer_cancel_enabled", label: "Let customers cancel an order before it ships", def: "1", type: "toggle" },
+  ] },
   { title: "More payment gateways (saved for later)", note: "Razorpay is already live in Admin → Payments. These are stored so they're ready when you connect another gateway.", fields: [
     { key: "cashfree_app_id", label: "Cashfree App ID", def: "" },
     { key: "cashfree_secret_key", label: "Cashfree secret key", def: "", type: "secret" },
@@ -256,6 +271,9 @@ export const MARKETING: FieldGroup[] = [
     { key: "feed_brand", label: "Brand name in feeds", def: "Jasmonoide" },
     { key: "feed_google_category", label: "Google product category", def: "Home & Garden > Decor" },
   ] },
+  { title: "Install as an app (PWA)", note: "Customers can add your shop to their phone's home screen. Upload a square PNG (512×512) to replace the default icon.", fields: [
+    { key: "pwa_icon", label: "App icon (512×512 PNG)", def: "", type: "image" },
+  ] },
   { title: "Mood finder quiz", fields: [
     { key: "quiz_enabled", label: "Show the mood finder quiz", def: "1", type: "toggle" },
     { key: "quiz_title", label: "Heading", def: "Find the candle that feels like you" },
@@ -271,4 +289,30 @@ export const MARKETING: FieldGroup[] = [
   ] },
 ];
 
-export const SITE_DEFAULTS: Record<string, string> = Object.fromEntries([...BRAND_SEO, ...ASSISTANT, ...HOME, ...PAYMENTS, ...BUSINESS, ...LEGAL, ...INTEGRATIONS, ...MARKETING].flatMap((g) => g.fields.map((f) => [f.key, f.def])));
+
+export const LOYALTY: FieldGroup[] = [
+  { title: "Loyalty points", note: "Customers earn points on delivered orders and spend them at checkout. 1 point = ₹1.", fields: [
+    { key: "loyalty_enabled", label: "Turn on loyalty points", def: "1", type: "toggle" },
+    { key: "loyalty_earn_pct", label: "Points earned (% of order value)", def: "5" },
+    { key: "loyalty_max_redeem_pct", label: "Max % of an order payable with points", def: "20" },
+    { key: "loyalty_min_redeem", label: "Minimum points to redeem", def: "50" },
+  ] },
+  { title: "Refer a friend", note: "Each customer gets a code. The friend gets money off their first order; the referrer gets store credit once that order is delivered.", fields: [
+    { key: "referral_enabled", label: "Turn on referrals", def: "1", type: "toggle" },
+    { key: "referral_friend_amount", label: "Friend's discount on first order (₹)", def: "100" },
+    { key: "referral_reward", label: "Referrer's store credit (₹)", def: "100" },
+    { key: "referral_min_order", label: "Minimum first-order value (₹)", def: "499" },
+  ] },
+  { title: "Gift cards & store credit", fields: [
+    { key: "giftcards_enabled", label: "Accept gift cards / store credit at checkout", def: "1", type: "toggle" },
+    { key: "giftcard_balance_page", label: "Show “Check gift card balance” page", def: "1", type: "toggle" },
+  ] },
+  { title: "Subscribe & save (refills)", note: "Customers pick a refill gap on a product page; we remind them (email/WhatsApp) when it's time and give a discount on that refill.", fields: [
+    { key: "subs_enabled", label: "Turn on “Subscribe & save” on product pages", def: "1", type: "toggle" },
+    { key: "subs_discount", label: "Refill discount (%)", def: "10" },
+    { key: "subs_intervals", label: "Refill gaps offered (days, comma separated)", def: "30,45,60,90" },
+    { key: "subs_remind_days", label: "Remind customers this many days before", def: "3" },
+  ] },
+];
+
+export const SITE_DEFAULTS: Record<string, string> = Object.fromEntries([...BRAND_SEO, ...ASSISTANT, ...HOME, ...PAYMENTS, ...BUSINESS, ...LEGAL, ...INTEGRATIONS, ...MARKETING, ...LOYALTY].flatMap((g) => g.fields.map((f) => [f.key, f.def])));

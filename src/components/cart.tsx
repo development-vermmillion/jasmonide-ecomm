@@ -1,5 +1,6 @@
 "use client";
 import { track } from "@/lib/track-client";
+import { ins } from "@/lib/insights-client";
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 
 export type CartItem = {
@@ -38,6 +39,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...cur, { ...i, key, qty: Math.min(qty, i.max) }];
     });
     setOpen(true);
+    ins("atc", { product_id: i.productId, val: i.price * qty });
     track("add_to_cart", { items: [{ id: i.productId, name: i.name, price: i.price, qty }], value: i.price * qty });
   }, []);
   const setQty = useCallback((key: string, qty: number) =>

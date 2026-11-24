@@ -25,6 +25,10 @@ async function init() {
         ["customers", "state", "text default ''"], ["customers", "pincode", "text default ''"], ["orders", "delivered_at", "text"], ["orders", "bulk_discount", "real default 0"], ["orders", "bulk_label", "text default ''"],
         ["orders", "payment_ref", "text default ''"], ["orders", "paid_at", "text"], ["orders", "shipped_at", "text"], ["orders", "gateway_order_id", "text default ''"], ["orders", "gateway_payment_id", "text default ''"], ["products", "hsn", "text default ''"],
         ["orders", "source", "text default 'direct'"], ["orders", "medium", "text default ''"], ["orders", "campaign", "text default ''"],
+        ["customers", "points", "integer default 0"], ["customers", "credit", "real default 0"], ["customers", "referral_code", "text default ''"], ["customers", "referred_by", "integer"],
+        ["orders", "gift_code", "text default ''"], ["orders", "gift_used", "real default 0"], ["orders", "credit_used", "real default 0"], ["orders", "points_used", "integer default 0"],
+        ["orders", "referral_code", "text default ''"], ["orders", "referral_discount", "real default 0"], ["orders", "points_awarded", "integer default 0"], ["orders", "cancel_reason", "text default ''"],
+        ["notify_requests", "notified_at", "text"],
       ];
       for (const [t, col, def] of MIGRATIONS) {
         const have = (await c.execute(`pragma table_info(${t})`)).rows.map((r: any) => r.name);

@@ -2,6 +2,9 @@ import { all, one, run, batch } from "./db";
 import { activeRules, computeBulk } from "./bulk";
 import { getProductById, getSettings, unitPrice, saleActive } from "./catalog";
 import { gatewayReady } from "./payments";
+import { checkReferral, lookupGift, spendWallet, reverseWallet, rewardDelivered, walletLog } from "./wallet";
+import { walletCalc } from "./wallet-calc";
+import { deliveryFor } from "./delivery";
 
 export async function checkCoupon(code: string, subtotal: number) {
   if ((await getSettings()).coupons_enabled !== "1") return { ok: false, discount: 0, message: "Coupons are currently disabled" };
@@ -44,6 +47,7 @@ export async function moveStock(product_id: number, variant_id: number | null, d
   await run("insert into stock_log (product_id, variant_id, delta, balance, reason, ref) values (?,?,?,?,?,?)", [
     product_id, variant_id, delta, r?.stock ?? 0, reason, ref,
   ]);
+  if (delta > 0 && (r?.stock ?? 0) > 0 && (r?.stock ?? 0) - delta <= 0) import("./notify").then((n) => n.notifyRestock(product_id, variant_id)).catch(() => {});
 }
 
 export async function setStock(product_id: number, variant_id: number | null, value: number, reason: string) {
@@ -58,6 +62,7 @@ type CartLine = { productId: number; variantId?: number | null; qty: number };
 export async function createOrder(input: {
   items: CartLine[]; customer: any; payment_method: string; coupon?: string; customerId?: number | null;
   source?: { source?: string; medium?: string; campaign?: string }; session?: string;
+  giftCode?: string; useCredit?: boolean; points?: number; referral?: string;
 }) {
   const s = await getSettings();
   if (s.maintenance_mode === "1") throw new Error("The store is temporarily closed. Please try again later.");
@@ -85,17 +90,23 @@ export async function createOrder(input: {
   }
   const subtotal = lines.reduce((a, l) => a + l.price * l.qty, 0);
   const physicalOrder = lines.some((l) => l.type !== "digital");
-  const pm = input.payment_method || "cod";
-  if (pm === "cod" && (s.cod_enabled !== "1" || !physicalOrder)) throw new Error("Cash on delivery is not available for this order");
-  if (pm === "upi" && s.upi_enabled !== "1") throw new Error("UPI payment is not available right now");
-  if (pm === "online" && !(await gatewayReady())) throw new Error("Online payment is not available right now");
-  if (pm !== "cod" && pm !== "upi" && pm !== "online") throw new Error("Choose a payment method");
+  if (physicalOrder) {
+    const dv = deliveryFor(c.pincode, s);
+    if (!dv.ok) throw new Error(dv.message);
+    if (input.payment_method === "cod" && dv.codOk === false) throw new Error("Cash on delivery isn't available for your pincode. Please choose UPI or online payment.");
+  }
   const bulk = computeBulk(await activeRules(), lines.map((l) => ({ productId: l.product_id, categoryId: l.category_id, price: l.price, qty: l.qty })));
   let discount = bulk.discount, couponCode = "";
   if (input.coupon) {
     const r = await checkCoupon(input.coupon, subtotal - bulk.discount);
     if (!r.ok) throw new Error(r.message);
     discount += r.discount; couponCode = r.coupon.code;
+  }
+  let referralCode = "", referralDiscount = 0;
+  if (input.referral) {
+    const r = await checkReferral(input.referral, { customerId: input.customerId, email: c.email, phone: c.phone }, subtotal - discount);
+    if (!r.ok) throw new Error(r.message);
+    referralDiscount = r.discount; referralCode = String(input.referral).trim().toUpperCase(); discount += referralDiscount;
   }
   const physical = lines.some((l) => l.type !== "digital");
   const after = subtotal - discount;
@@ -104,7 +115,7 @@ export async function createOrder(input: {
   const inclusive = s.tax_inclusive === "1";
   // inclusive: GST is already inside the prices (shown on the invoice); exclusive: GST is added on top
   const tax = inclusive ? Math.round((after - after / (1 + rate / 100)) * 100) / 100 : Math.round(after * rate) / 100;
-  const total = Math.round((after + shipping + (inclusive ? 0 : tax)) * 100) / 100;
+  const gross = Math.round((after + shipping + (inclusive ? 0 : tax)) * 100) / 100;
 
   // customer
   let cust: any = input.customerId ? { id: input.customerId } : null;
@@ -113,17 +124,44 @@ export async function createOrder(input: {
   const customer_id = cust?.id ?? (await run("insert into customers (name,email,phone) values (?,?,?)", [c.name, c.email || "", c.phone || ""])).id;
 
   await run("update customers set name = ? where id = ? and name = 'Customer'", [c.name, customer_id]);
+
+  // wallet: gift card → store credit → loyalty points. `total` is what the customer still has to pay.
+  let giftBal = 0, giftCode = "";
+  if (input.giftCode && s.giftcards_enabled === "1") {
+    const g = await lookupGift(input.giftCode);
+    if (!g.ok) throw new Error(g.message);
+    giftBal = g.balance; giftCode = g.card.code;
+  }
+  const cu = await one("select credit, points from customers where id = ?", [customer_id]);
+  const signedIn = !!input.customerId && input.customerId === customer_id;
+  const w = walletCalc(gross, {
+    gift: giftBal, credit: signedIn && s.giftcards_enabled === "1" ? cu?.credit || 0 : 0, useCredit: !!input.useCredit,
+    points: signedIn && s.loyalty_enabled === "1" ? cu?.points || 0 : 0, pointsWanted: Number(input.points) || 0,
+    maxPct: Number(s.loyalty_max_redeem_pct) || 0, minRedeem: Number(s.loyalty_min_redeem) || 0,
+  });
+  const total = w.payable;
+  const walletOnly = total <= 0.009 && gross > 0;
+  const pm = walletOnly ? "wallet" : input.payment_method || "cod";
+  if (pm === "cod" && (s.cod_enabled !== "1" || !physicalOrder)) throw new Error("Cash on delivery is not available for this order");
+  if (pm === "upi" && s.upi_enabled !== "1") throw new Error("UPI payment is not available right now");
+  if (pm === "online" && !(await gatewayReady())) throw new Error("Online payment is not available right now");
+  if (pm !== "cod" && pm !== "upi" && pm !== "online" && pm !== "wallet") throw new Error("Choose a payment method");
   const tmp = "TMP" + Date.now() + Math.floor(Math.random() * 1000);
   const o = await run(
-    `insert into orders (number,customer_id,name,email,phone,address,city,state,pincode,subtotal,discount,bulk_discount,bulk_label,shipping,tax,total,coupon_code,payment_method,payment_status,status,notes,source,medium,campaign)
-     values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'pending','pending',?,?,?,?)`,
+    `insert into orders (number,customer_id,name,email,phone,address,city,state,pincode,subtotal,discount,bulk_discount,bulk_label,shipping,tax,total,coupon_code,payment_method,payment_status,status,notes,source,medium,campaign,gift_code,gift_used,credit_used,points_used,referral_code,referral_discount)
+     values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'pending','pending',?,?,?,?,?,?,?,?,?,?)`,
     [tmp, customer_id, c.name, c.email || "", c.phone || "", c.address || "", c.city || "", c.state || "", c.pincode || "", subtotal, discount, bulk.discount, bulk.label, shipping, tax, total,
-      couponCode, input.payment_method || "cod", c.notes || "",
-      (input.source?.source || "direct").slice(0, 40), (input.source?.medium || "").slice(0, 40), (input.source?.campaign || "").slice(0, 60)]
+      couponCode, pm, c.notes || "",
+      (input.source?.source || "direct").slice(0, 40), (input.source?.medium || "").slice(0, 40), (input.source?.campaign || "").slice(0, 60),
+      giftCode, w.gift, w.credit, w.points, referralCode, referralDiscount]
   );
   const number = "JM" + (1000 + o.id);
   await run("update orders set number = ? where id = ?", [number, o.id]);
-  await addEvent(o.id, "Order placed", pm === "cod" ? "Cash on delivery" : pm === "upi" ? "UPI — awaiting payment" : "Online payment — awaiting payment");
+  await addEvent(o.id, "Order placed", pm === "cod" ? "Cash on delivery" : pm === "upi" ? "UPI — awaiting payment" : pm === "wallet" ? "Paid with gift card / credit / points" : "Online payment — awaiting payment");
+  try { await spendWallet({ number, customerId: customer_id, giftCode, gift: w.gift, credit: w.credit, points: w.points }); }
+  catch (e) { await run("delete from orders where id = ?", [o.id]); throw e; }
+  if (w.gift + w.credit + w.points > 0) await addEvent(o.id, "Wallet used", [w.gift && `Gift card ₹${w.gift}`, w.credit && `Store credit ₹${w.credit}`, w.points && `${w.points} points`].filter(Boolean).join(" · "));
+  if (walletOnly) await updateOrder(o.id, { payment_status: "paid" });
   await batch(lines.map((l) => ({
     sql: "insert into order_items (order_id,product_id,variant_id,name,variant_name,sku,price,qty,image,type) values (?,?,?,?,?,?,?,?,?,?)",
     args: [o.id, l.product_id, l.variant_id, l.name, l.variant_name, l.sku, l.price, l.qty, l.image, l.type],
@@ -164,7 +202,12 @@ export async function updateOrder(id: number, patch: any) {
       const items = await all("select * from order_items where order_id = ?", [id]);
       for (const m of await expandStock(items))
         await moveStock(m.product_id, m.variant_id, isClosed ? m.qty : -m.qty, isClosed ? `Order ${patch.status} – stock restored` : "Order re-opened", cur.number);
+      if (isClosed) await reverseWallet(cur).catch(() => {});
     }
+    if (patch.status === "delivered") { const fresh = await one("select * from orders where id = ?", [id]); await rewardDelivered(fresh).catch(() => {}); }
+    import("./notify").then((n) => n.notifyOrderStatus(id, patch.status)).catch(() => {});
+  } else if (patch.payment_status === "paid" && cur.payment_status !== "paid" && cur.status === "pending" && !patch.status) {
+    import("./notify").then((n) => n.notifyOrderStatus(id, "confirmed")).catch(() => {});
   }
 }
 

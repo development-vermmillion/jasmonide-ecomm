@@ -16,7 +16,7 @@ export async function getCustomer() {
   if (!t) return null;
   try {
     const { payload } = await jwtVerify(t, secret());
-    return await one("select id, name, email, phone, address, city, state, pincode from customers where id = ?", [Number(payload.id)]);
+    return await one("select id, name, email, phone, address, city, state, pincode, points, credit, referral_code from customers where id = ?", [Number(payload.id)]);
   } catch {
     return null;
   }

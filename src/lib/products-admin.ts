@@ -50,8 +50,10 @@ export async function saveProduct(b: any, id?: number) {
   if (id) {
     const old = await one("select stock, type from products where id = ?", [id]);
     await run(`update products set ${cols.map((c) => c + " = ?").join(", ")}, updated_at = datetime('now') where id = ?`, [...vals, id]);
-    if (old && type === "simple" && old.stock !== Math.floor(num(b.stock)))
+    if (old && type === "simple" && old.stock !== Math.floor(num(b.stock))) {
       await run("insert into stock_log (product_id,delta,balance,reason) values (?,?,?,?)", [id, Math.floor(num(b.stock)) - old.stock, Math.floor(num(b.stock)), "Edited in product form"]);
+      if (old.stock <= 0 && Math.floor(num(b.stock)) > 0) import("./notify").then((n) => n.notifyRestock(id, null)).catch(() => {});
+    }
   } else {
     const r = await run(`insert into products (${cols.join(",")}) values (${cols.map(() => "?").join(",")})`, vals);
     pid = r.id;
@@ -71,6 +73,7 @@ export async function saveProduct(b: any, id?: number) {
       const old = await one("select stock from variants where id = ?", [v.id]);
       await run("update variants set name=?, sku=?, price=?, sale_price=?, stock=? where id = ?", [...vv, v.id]);
       if (old && old.stock !== vv[4]) await run("insert into stock_log (product_id,variant_id,delta,balance,reason) values (?,?,?,?,?)", [pid, v.id, (vv[4] as number) - old.stock, vv[4], "Edited in product form"]);
+      if (old && old.stock <= 0 && (vv[4] as number) > 0) import("./notify").then((n) => n.notifyRestock(pid, v.id)).catch(() => {});
     } else {
       const r = await run("insert into variants (product_id,name,sku,price,sale_price,stock) values (?,?,?,?,?,?)", [pid, ...vv]);
       if (vv[4]) await run("insert into stock_log (product_id,variant_id,delta,balance,reason) values (?,?,?,?,?)", [pid, r.id, vv[4], vv[4], "Opening stock"]);

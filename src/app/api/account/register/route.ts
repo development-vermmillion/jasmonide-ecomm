@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { one, run } from "@/lib/db";
 import { getSettings } from "@/lib/catalog";
+import { allow, clientIp, TOO_MANY } from "@/lib/ratelimit";
 import { signCustomer, setCustomerCookie } from "@/lib/customer-auth";
 
 export async function POST(req: Request) {
   const s = await getSettings();
   if (s.accounts_enabled !== "1") return NextResponse.json({ ok: false, error: "Accounts are disabled" }, { status: 403 });
   const b = await req.json();
+  if (!(await allow("reg:ip:" + clientIp(req), 10, 3600))) return NextResponse.json(TOO_MANY, { status: 429 });
   const email = String(b.email || "").trim().toLowerCase();
   if (!b.name?.trim() || !/^\S+@\S+\.\S+$/.test(email) || String(b.password || "").length < 6)
     return NextResponse.json({ ok: false, error: "Enter your name, a valid email and a password of 6+ characters" }, { status: 400 });

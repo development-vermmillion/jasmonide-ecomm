@@ -4,6 +4,7 @@ import { fdatetime } from "@/lib/util";
 import BackupNow from "@/components/admin/BackupNow";
 import { DeleteButton } from "@/components/admin/ui";
 import Link from "next/link";
+import { orderToken } from "@/lib/token";
 
 export const dynamic = "force-dynamic";
 export default async function Backups() {
@@ -25,6 +26,9 @@ export default async function Backups() {
             <td className="td space-x-3 text-right"><a className="text-xs underline" href={`/api/admin/backups/${b.file}`}>Download</a><DeleteButton url={`/api/admin/backups/${b.file}`} label="Delete" confirm="Delete this backup?" /></td></tr>)}
           {!rows.length && <tr><td className="td text-neutral-500" colSpan={4}>No backups yet — click “Back up now”.</td></tr>}
         </tbody></table></div>
+      <details className="card p-5 text-sm"><summary className="cursor-pointer font-medium">Scheduled jobs (refill reminders, backups)</summary>
+        <p className="mt-3 text-neutral-600">These run automatically whenever customers visit. To make sure they also run on quiet days, add a free hourly cron (cPanel → Cron Jobs, or cron-job.org) that opens this address:</p>
+        <code className="mt-2 block break-all rounded bg-neutral-100 p-2 text-xs">{(s.site_url || "").startsWith("http") ? s.site_url.replace(/\/$/, "") : "https://YOUR-SITE"}/api/cron?t={orderToken("cron")}</code></details>
       <details className="card p-5 text-sm"><summary className="cursor-pointer font-medium">How to restore a backup</summary>
         <ol className="mt-3 list-decimal space-y-1 pl-5 text-neutral-600"><li>Stop the site (Hostinger → Node.js app → Stop).</li><li>Replace <code>data/store.db</code> with the backup file (rename it to <code>store.db</code>) using the file manager.</li><li>Start the site again. Ask me if you'd like help doing this.</li></ol></details>
     </div>

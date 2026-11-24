@@ -17,6 +17,8 @@ export default function AuthForms({ next, cfg, err }: { next: string; cfg: Cfg; 
   // phone OTP
   const [ph, setPh] = useState(""); const [sent, setSent] = useState(false); const [code, setCode] = useState(""); const [nm, setNm] = useState(""); const [test, setTest] = useState("");
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value });
+  const [forgot, setForgot] = useState(false); const [fdone, setFdone] = useState(""); const [flink, setFlink] = useState("");
+  async function sendReset(e: React.FormEvent) { e.preventDefault(); const r = await post("/api/account/forgot", { email: f.email }); if (!r.ok) return setMsg(r.error); setFdone("If an account exists for that email, a reset link is on its way. Check your inbox (and spam)."); setFlink(r.testLink || ""); }
   const done = () => { router.push(next); router.refresh(); };
   async function post(url: string, body: any) { setBusy(true); setMsg(""); const r = await (await fetch(url, { method: "POST", body: JSON.stringify(body) })).json().catch(() => ({ ok: false, error: "Something went wrong" })); setBusy(false); return r; }
 
@@ -51,7 +53,17 @@ export default function AuthForms({ next, cfg, err }: { next: string; cfg: Cfg; 
           <button type="button" className="w-full text-center text-xs underline" onClick={() => sendCode()}>Resend code</button>
         </form>
       ))}
-      {cfg.password && (!cfg.otp || tab === "email") && (
+      {cfg.password && (!cfg.otp || tab === "email") && forgot && (
+        <form onSubmit={sendReset} className="space-y-3">
+          <p className="text-sm text-neutral-600">Enter your email and we'll send a link to choose a new password.</p>
+          <div><label className="label">Email</label><input required type="email" className="input" value={f.email} onChange={set("email")} /></div>
+          {fdone && <p className="rounded-lg bg-mint p-3 text-sm text-green-800">{fdone}</p>}
+          {flink && <p className="rounded-lg bg-butter/70 p-2 text-xs">Test mode (email not set up): <a className="underline break-all" href={flink}>{flink}</a></p>}
+          <button disabled={busy} className="btn w-full">{busy ? "Please wait…" : "Send reset link"}</button>
+          <button type="button" className="w-full text-center text-xs underline" onClick={() => { setForgot(false); setFdone(""); setMsg(""); }}>Back to sign in</button>
+        </form>
+      )}
+      {cfg.password && (!cfg.otp || tab === "email") && !forgot && (
         <form onSubmit={pwd} className="space-y-3">
           <div className="grid grid-cols-2 gap-1 rounded-full bg-lilac/60 p-1 text-sm">
             {(["login", "register"] as const).map((m) => <button type="button" key={m} onClick={() => setMode(m)} className={`rounded-full py-2 transition ${mode === m ? "bg-white font-semibold shadow-sm" : ""}`}>{m === "login" ? "Sign in" : "Create account"}</button>)}
@@ -61,6 +73,7 @@ export default function AuthForms({ next, cfg, err }: { next: string; cfg: Cfg; 
           {mode === "register" && <div><label className="label">Phone</label><input className="input" value={f.phone} onChange={set("phone")} /></div>}
           <div><label className="label">Password *</label><input required type="password" minLength={6} className="input" value={f.password} onChange={set("password")} /></div>
           <button disabled={busy} className="btn w-full">{busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}</button>
+          {mode === "login" && <button type="button" className="w-full text-center text-xs underline" onClick={() => { setForgot(true); setMsg(""); }}>Forgot password?</button>}
         </form>
       )}
       {!cfg.otp && !cfg.password && !cfg.google && <p className="text-center text-sm text-neutral-500">Sign-in is not set up yet.</p>}

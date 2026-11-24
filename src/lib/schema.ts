@@ -126,6 +126,29 @@ create table if not exists abandoned_carts (
   created_at text default (datetime('now')), updated_at text default (datetime('now'))
 );
 create table if not exists alerts_sent (id integer primary key autoincrement, key text not null, day text not null, unique(key, day));
+create table if not exists password_resets (
+  id integer primary key autoincrement, customer_id integer not null, token_hash text not null, expires_at text not null, used integer default 0, created_at text default (datetime('now'))
+);
+create table if not exists rate_hits (id integer primary key autoincrement, key text not null, ts integer not null);
+create index if not exists idx_rate_key on rate_hits(key, ts);
+create table if not exists gift_cards (
+  id integer primary key autoincrement, code text not null unique, initial real not null default 0, balance real not null default 0,
+  to_name text default '', to_email text default '', note text default '', active integer default 1, expires_at text, created_at text default (datetime('now'))
+);
+create table if not exists wallet_log (
+  id integer primary key autoincrement, customer_id integer, kind text not null, amount real not null, ref text default '', note text default '', created_at text default (datetime('now'))
+);
+create table if not exists subscriptions (
+  id integer primary key autoincrement, customer_id integer not null, product_id integer not null, variant_id integer, qty integer default 1,
+  every_days integer not null default 30, next_date text not null, active integer default 1, last_reminded text, created_at text default (datetime('now'))
+);
+create table if not exists events (
+  id integer primary key autoincrement, day text not null, ts integer not null, type text not null, session text default '', path text default '',
+  product_id integer, category_id integer, label text default '', x real, y real, ph real, device text default 'desktop', val real
+);
+create index if not exists idx_events_day_type on events(day, type);
+create index if not exists idx_events_path on events(path, type);
+create index if not exists idx_events_prod on events(product_id, type);
 create index if not exists idx_products_cat on products(category_id);
 create index if not exists idx_orders_created on orders(created_at);
 create index if not exists idx_items_order on order_items(order_id);

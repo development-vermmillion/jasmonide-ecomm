@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { allow, clientIp, TOO_MANY } from "@/lib/ratelimit";
 import { one, run } from "@/lib/db";
 import { getSettings } from "@/lib/catalog";
 import { getCustomer } from "@/lib/customer-auth";
 
 export async function POST(req: Request) {
+  if (!(await allow("review:" + clientIp(req), 8, 3600))) return NextResponse.json(TOO_MANY, { status: 429 });
   const s = await getSettings();
   if (s.reviews_enabled !== "1") return NextResponse.json({ ok: false, error: "Reviews are disabled" }, { status: 403 });
   const b = await req.json();

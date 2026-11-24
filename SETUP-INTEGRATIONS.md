@@ -21,3 +21,11 @@ Everything below is configured in **Admin** (no code). Owners only unless noted.
 | Sales by source / abandoned carts | Sources & carts | Add `?utm_source=instagram&utm_medium=bio` to the links you share. |
 
 Customers' phone-OTP codes, Google logins and order history all appear under *My account* on the store.
+
+## New in this version
+- **Forgot password**, **login rate limits**, **pincode delivery check**, **customer cancel order**, branded 404/error pages.
+- **Gift cards, store credit, loyalty points, referrals** — Admin → Gift cards & credit, Loyalty & referrals.
+- **Refill plans (Subscribe & save)** — Admin → Refill plans. Reminders need Email or WhatsApp set up; add the hourly cron URL shown in Admin → Backups.
+- **Order status emails/WhatsApp** and **back-in-stock alerts** — switches in Admin → Integrations.
+- **Installable app (PWA)** — works on https; upload an icon in Marketing & tools.
+- **Insights & Click heatmap** — Admin → Insights / Click heatmap. First-party, no external tool; your own admin visits are ignored.

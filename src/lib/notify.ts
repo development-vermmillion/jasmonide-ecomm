@@ -106,3 +106,57 @@ export async function checkLowStock(force = false): Promise<string[]> {
   const text = `Low stock at ${s.store_name}:\n` + list.map((l) => `• ${l.name}${l.variant ? " (" + l.variant + ")" : ""}: ${l.stock} left (alert at ${l.low})`).join("\n");
   return alertOwner(`Low stock: ${list.length} item${list.length > 1 ? "s" : ""}`, text, "stock");
 }
+
+const esc = (t: any) => String(t ?? "").replace(/</g, "&lt;");
+const siteBase = (s: Record<string, string>) => ((s.site_url || "").startsWith("http") ? s.site_url.replace(/\/$/, "") : "");
+
+export function emailShell(s: Record<string, string>, title: string, bodyHtml: string, cta?: { href: string; label: string }) {
+  return `<div style="font:15px/1.6 system-ui,sans-serif;max-width:540px;margin:auto;color:#2a2a2a"><h2 style="font-family:Georgia,serif;font-weight:500">${esc(title)}</h2>${bodyHtml}${cta ? `<p style="margin:22px 0"><a href="${cta.href}" style="background:#2a2a2a;color:#fff;text-decoration:none;padding:11px 22px;border-radius:999px;display:inline-block">${esc(cta.label)}</a></p>` : ""}<p style="color:#777;font-size:13px">— ${esc(s.store_name)}${s.phone ? " · " + esc(s.phone) : ""}</p></div>`;
+}
+
+const STATUS_TEXT: Record<string, [string, string]> = {
+  confirmed: ["Your order is confirmed", "We've got everything and are getting your order ready. Each piece is packed by hand."],
+  processing: ["We're packing your order", "Your order is being carefully prepared."],
+  shipped: ["Your order is on its way", "It has left our studio and is heading to you."],
+  delivered: ["Your order was delivered", "We hope it brings a little glow to your day. A review would mean the world to us."],
+  cancelled: ["Your order was cancelled", "If you paid online, your refund will be processed to the original payment method."],
+  returned: ["Your return is complete", "Thank you — we'll process your refund shortly."],
+};
+
+/** Email / WhatsApp the customer when their order moves to a new status. Never throws. */
+export async function notifyOrderStatus(orderId: number, status: string) {
+  try {
+    const s = await getSettings();
+    const t = STATUS_TEXT[status];
+    if (!t) return;
+    const o = await one("select * from orders where id = ?", [orderId]);
+    if (!o) return;
+    const { orderToken } = await import("./token");
+    const link = `${siteBase(s)}/order/${o.number}?t=${orderToken(o.number)}`;
+    const track = status === "shipped" && o.tracking ? `<p>Tracking number: <b>${esc(o.tracking)}</b></p>` : "";
+    if (o.email && s.notify_status_email === "1")
+      await sendEmail(o.email, `${t[0]} · ${o.number}`, emailShell(s, `${t[0]}, ${esc(String(o.name || "").split(" ")[0])}`, `<p>${t[1]}</p><p>Order <b>${o.number}</b></p>${track}`, siteBase(s) ? { href: link, label: "View your order" } : undefined));
+    if (o.phone && s.notify_status_whatsapp === "1")
+      await sendWhatsApp(o.phone, s.wa_order_template, [String(o.name || "there").split(" ")[0], o.number, t[0].toLowerCase(), o.tracking || "—"]);
+  } catch {}
+}
+
+/** A sold-out product is back — tell everyone who asked, once. */
+export async function notifyRestock(productId: number, variantId: number | null) {
+  try {
+    const s = await getSettings();
+    const reqs = await all("select * from notify_requests where product_id = ? and notified_at is null and (variant_id is null or variant_id = ? or ? is null)", [productId, variantId, variantId]);
+    if (!reqs.length) return;
+    const p = await one("select name, slug from products where id = ?", [productId]);
+    if (!p) return;
+    const link = `${siteBase(s)}/product/${p.slug}`;
+    for (const r of reqs) {
+      let sent = false;
+      if (r.email && s.notify_restock_email === "1")
+        sent = (await sendEmail(r.email, `${p.name} is back in stock`, emailShell(s, "Good news — it's back 💛", `<p><b>${esc(p.name)}</b> is available again. Stock is limited, so grab yours soon.</p>`, siteBase(s) ? { href: link, label: "Shop now" } : undefined))).ok || sent;
+      if (r.phone && s.notify_restock_whatsapp === "1") sent = (await sendWhatsApp(r.phone, s.wa_order_template, ["there", p.name, "back in stock", link])).ok || sent;
+      // only mark as told when a message really went out, so nobody is silently skipped while email/WhatsApp isn't set up yet
+      if (sent) await run("update notify_requests set notified_at = datetime('now') where id = ?", [r.id]);
+    }
+  } catch {}
+}

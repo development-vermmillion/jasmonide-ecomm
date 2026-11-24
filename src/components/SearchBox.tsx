@@ -32,7 +32,7 @@ export default function SearchBox({ cats = [] }: { cats?: { name: string; slug: 
   }, [open]);
   useEffect(() => {
     if (q.trim().length < 2) { setRes(null); return; }
-    const t = setTimeout(async () => { try { setRes(await (await fetch("/api/search?q=" + encodeURIComponent(q.trim()))).json()); } catch { setRes([]); } }, 220);
+    const t = setTimeout(async () => { try { const r = await (await fetch("/api/search?q=" + encodeURIComponent(q.trim()))).json(); setRes(r); import("@/lib/insights-client").then((m) => m.ins("search", { label: q.trim().toLowerCase().slice(0, 50), val: Array.isArray(r) ? r.length : 0 })); } catch { setRes([]); } }, 220);
     return () => clearTimeout(t);
   }, [q]);
 

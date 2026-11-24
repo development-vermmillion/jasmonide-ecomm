@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { one } from "@/lib/db";
 import { getSettings } from "@/lib/catalog";
+import { allow, clientIp, TOO_MANY } from "@/lib/ratelimit";
 import { signCustomer, setCustomerCookie } from "@/lib/customer-auth";
 
 export async function POST(req: Request) {
   if ((await getSettings()).accounts_enabled !== "1") return NextResponse.json({ ok: false, error: "Accounts are disabled" }, { status: 403 });
   const { email, password } = await req.json();
+  if (!(await allow("clogin:ip:" + clientIp(req), 20, 900)) || !(await allow("clogin:" + String(email || "").toLowerCase(), 8, 900))) return NextResponse.json(TOO_MANY, { status: 429 });
   const c = await one("select id, password_hash from customers where lower(email) = ?", [String(email || "").trim().toLowerCase()]);
   if (!c?.password_hash || !bcrypt.compareSync(String(password || ""), c.password_hash))
     return NextResponse.json({ ok: false, error: "Incorrect email or password" }, { status: 401 });

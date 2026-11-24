@@ -1,17 +1,17 @@
 "use client";
 import Link from "next/link";
-import { LayoutDashboard, BarChart3, Package, Layers, FolderTree, Warehouse, Percent, ShoppingCart, Users, Ticket, Settings, UserCog, CreditCard, FileText, Film, Star, Plug, Scale, Megaphone, Radar, FileSpreadsheet, DatabaseBackup, Sparkles, Globe, Home, BookOpen, HelpCircle, Undo2, Inbox, LogOut, ExternalLink, Menu, X } from "lucide-react";
+import { LayoutDashboard, BarChart3, Package, Layers, FolderTree, Warehouse, Percent, ShoppingCart, Users, Ticket, Settings, UserCog, CreditCard, FileText, Film, Star, Plug, Scale, Megaphone, Radar, Gift, Repeat, Heart, Flame, Lightbulb, FileSpreadsheet, DatabaseBackup, Sparkles, Globe, Home, BookOpen, HelpCircle, Undo2, Inbox, LogOut, ExternalLink, Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { canViewPage } from "@/lib/roles";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV = [
-  ["Overview", [["/admin", "Dashboard", LayoutDashboard], ["/admin/reports", "Sales reports", BarChart3]]],
+  ["Overview", [["/admin", "Dashboard", LayoutDashboard], ["/admin/reports", "Sales reports", BarChart3], ["/admin/insights", "Insights", Lightbulb], ["/admin/heatmap", "Click heatmap", Flame]]],
   ["Catalogue", [["/admin/products", "Products", Package], ["/admin/products?type=combo", "Combos", Layers], ["/admin/categories", "Categories", FolderTree], ["/admin/inventory", "Inventory & stock", Warehouse], ["/admin/offers", "Sales & offers", Percent], ["/admin/bulk", "Bulk discounts", Layers], ["/admin/import-export", "Import / export", FileSpreadsheet]]],
-  ["Sales", [["/admin/orders", "Orders", ShoppingCart], ["/admin/customers", "Customers", Users], ["/admin/coupons", "Coupons", Ticket], ["/admin/payments", "Payments", CreditCard], ["/admin/sources", "Sources & carts", Radar], ["/admin/returns", "Returns & refunds", Undo2]]],
+  ["Sales", [["/admin/orders", "Orders", ShoppingCart], ["/admin/customers", "Customers", Users], ["/admin/coupons", "Coupons", Ticket], ["/admin/payments", "Payments", CreditCard], ["/admin/gift-cards", "Gift cards & credit", Gift], ["/admin/subscriptions", "Refill plans", Repeat], ["/admin/sources", "Sources & carts", Radar], ["/admin/returns", "Returns & refunds", Undo2]]],
   ["Engagement", [["/admin/reels", "Instagram reels", Film], ["/admin/reviews", "Reviews", Star], ["/admin/assistant", "AI assistant", Sparkles], ["/admin/inbox", "Inbox & leads", Inbox]]],
-  ["Store", [["/admin/homepage", "Homepage content", Home], ["/admin/brand", "Brand, SEO & AI", Globe], ["/admin/marketing", "Marketing & tools", Megaphone], ["/admin/legal", "Legal pages", Scale], ["/admin/blog", "Blog", BookOpen], ["/admin/faqs", "FAQs", HelpCircle], ["/admin/invoice-settings", "Invoice & GST", FileText], ["/admin/settings", "Settings & switches", Settings], ["/admin/integrations", "Integrations", Plug], ["/admin/backups", "Backups", DatabaseBackup], ["/admin/users", "Team & roles", UserCog]]],
+  ["Store", [["/admin/homepage", "Homepage content", Home], ["/admin/brand", "Brand, SEO & AI", Globe], ["/admin/marketing", "Marketing & tools", Megaphone], ["/admin/legal", "Legal pages", Scale], ["/admin/loyalty", "Loyalty & referrals", Heart], ["/admin/blog", "Blog", BookOpen], ["/admin/faqs", "FAQs", HelpCircle], ["/admin/invoice-settings", "Invoice & GST", FileText], ["/admin/settings", "Settings & switches", Settings], ["/admin/integrations", "Integrations", Plug], ["/admin/backups", "Backups", DatabaseBackup], ["/admin/users", "Team & roles", UserCog]]],
 ] as const;
 
 export default function Sidebar({ name, role, store, logo, counts }: { name: string; role: string; store: string; logo?: string; counts: Record<string, number> }) {

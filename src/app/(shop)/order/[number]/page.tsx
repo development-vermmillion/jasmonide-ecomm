@@ -10,6 +10,8 @@ import { getSettings } from "@/lib/catalog";
 import { orderToken } from "@/lib/token";
 import { returnEligibility } from "@/lib/returns";
 import ReturnForm from "@/components/ReturnForm";
+import CancelOrder from "@/components/CancelOrder";
+import { deliveryFor } from "@/lib/delivery";
 import TrackEvent from "@/components/TrackEvent";
 import { inr, fdatetime } from "@/lib/util";
 
@@ -29,6 +31,8 @@ export default async function OrderPage({ params, searchParams }: { params: { nu
   }
   const ret = await one("select * from returns where order_id = ? order by id desc", [o.id]);
   const elig = returnEligibility(o, s, !!ret);
+  const canCancel = s.customer_cancel_enabled === "1" && ["pending", "confirmed", "processing"].includes(o.status);
+  const eta = ["pending", "confirmed", "processing", "shipped"].includes(o.status) && o.address ? deliveryFor(o.pincode, s, new Date((o.shipped_at || o.created_at).replace(" ", "T") + "Z")) : null;
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <TrackEvent event="purchase" once id={o.number} value={o.total} items={items.map((i: any) => ({ id: i.product_id, name: i.name, price: i.price, qty: i.qty }))} />
@@ -42,6 +46,8 @@ export default async function OrderPage({ params, searchParams }: { params: { nu
         <PayPanel number={o.number} token={searchParams.t!} method={o.payment_method} total={o.total} autostart={searchParams.pay === "1"} paymentRef={o.payment_ref}
           upi={upi} bank={bank} />
       )}
+      {eta?.ok && <p className="mt-3 rounded-xl bg-sky/50 px-4 py-2.5 text-sm">🚚 Estimated delivery: <b>{eta.from} – {eta.to}</b></p>}
+      {o.cancel_reason && o.status === "cancelled" && <p className="mt-3 text-sm text-neutral-600">Cancelled — {o.cancel_reason}</p>}
       {o.payment_method === "cod" && <p className="mt-3 text-sm text-neutral-600">Payment: cash on delivery — keep <b>{inr(o.total)}</b> ready.</p>}
 
       <div className="card mt-6 divide-y divide-neutral-100">
@@ -54,7 +60,11 @@ export default async function OrderPage({ params, searchParams }: { params: { nu
           <div className="flex justify-between"><span>Subtotal</span><span>{inr(o.subtotal)}</span></div>
           {o.bulk_discount > 0 && <div className="flex justify-between"><span>{o.bulk_label || "Bulk discount"}</span><span>−{inr(o.bulk_discount)}</span></div>}
           {o.discount - (o.bulk_discount || 0) > 0 && <div className="flex justify-between"><span>Discount {o.coupon_code && `(${o.coupon_code})`}</span><span>−{inr(o.discount - (o.bulk_discount || 0))}</span></div>}
+          {o.referral_discount > 0 && <div className="flex justify-between"><span>Friend referral ({o.referral_code})</span><span>−{inr(o.referral_discount)}</span></div>}
           <div className="flex justify-between"><span>Shipping</span><span>{o.shipping ? inr(o.shipping) : "Free"}</span></div>
+          {o.gift_used > 0 && <div className="flex justify-between text-green-700"><span>Gift card</span><span>−{inr(o.gift_used)}</span></div>}
+          {o.credit_used > 0 && <div className="flex justify-between text-green-700"><span>Store credit</span><span>−{inr(o.credit_used)}</span></div>}
+          {o.points_used > 0 && <div className="flex justify-between text-green-700"><span>Loyalty points ({o.points_used})</span><span>−{inr(o.points_used)}</span></div>}
           {o.tax > 0 && <div className="flex justify-between text-neutral-500"><span>{s.tax_inclusive === "1" ? "Includes GST" : "GST"}</span><span>{inr(o.tax)}</span></div>}
           <div className="flex justify-between pt-2 text-base font-semibold"><span>Total</span><span>{inr(o.total)}</span></div>
         </div>
@@ -62,6 +72,7 @@ export default async function OrderPage({ params, searchParams }: { params: { nu
       {o.address && <p className="mt-4 text-sm text-neutral-600">Shipping to: {o.name}, {o.address}, {o.city}, {o.state} {o.pincode} · {o.phone}</p>}
       {ret && <div className="mt-6 rounded-xl bg-sky/60 p-4 text-sm"><p className="font-semibold">Return request: <span className="capitalize">{ret.status}</span></p>{ret.admin_note && <p className="mt-1">{ret.admin_note}</p>}{ret.refund_amount > 0 && <p className="mt-1">Refund: {inr(ret.refund_amount)}</p>}</div>}
       {!ret && elig.ok && <div className="mt-6"><ReturnForm number={o.number} token={searchParams.t!} /></div>}
+      {canCancel && <div className="mt-6"><CancelOrder number={o.number} token={searchParams.t!} paid={o.payment_status === "paid" && o.payment_method !== "cod"} /></div>}
       <div className="mt-8 flex flex-wrap gap-3"><Link href={`/invoice/${o.number}?t=${searchParams.t}`} className="btn-outline"><FileText size={16} /> Invoice</Link><Link href="/shop" className="btn">Continue shopping <ArrowRight size={16} /></Link>{s.track_enabled === "1" && <Link href="/track" className="btn-outline"><PackageSearch size={16} /> Track order</Link>}</div>
     </div>
   );

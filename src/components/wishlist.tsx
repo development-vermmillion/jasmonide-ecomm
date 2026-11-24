@@ -11,6 +11,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [ids, setIds] = useState<number[]>([]);
   useEffect(() => { try { setIds(JSON.parse(localStorage.getItem("wishlist") || "[]")); } catch {} }, []);
   const toggle = useCallback((id: number) => setIds((cur) => {
+    import("@/lib/insights-client").then((m) => m.ins(cur.includes(id) ? "unwish" : "wish", { product_id: id }));
     const n = cur.includes(id) ? cur.filter((x) => x !== id) : [id, ...cur];
     try { localStorage.setItem("wishlist", JSON.stringify(n)); } catch {}
     return n;
