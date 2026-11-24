@@ -1,6 +1,7 @@
 "use client";
 import { Banknote, Smartphone, Lock, Tag, CreditCard } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { track } from "@/lib/track-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "./cart";
@@ -11,7 +12,7 @@ export default function CheckoutForm({ cfg }: { cfg: { shipping: number; freeMin
   const { items, subtotal, clear, ready } = useCart();
   const router = useRouter();
   const bulk = useBulk(items);
-  const [f, setF] = useState<any>({ name: cfg.me?.name || "", phone: cfg.me?.phone || "", email: cfg.me?.email || "", address: cfg.me?.address || "", city: cfg.me?.city || "", state: cfg.me?.state || "", pincode: cfg.me?.pincode || "", notes: "" });
+  const [f, setF] = useState<any>({ name: cfg.me?.name && cfg.me.name !== "Customer" ? cfg.me.name : "", phone: cfg.me?.phone || "", email: cfg.me?.email || "", address: cfg.me?.address || "", city: cfg.me?.city || "", state: cfg.me?.state || "", pincode: cfg.me?.pincode || "", notes: "" });
   const [pay, setPay] = useState(cfg.online ? "online" : cfg.upi ? "upi" : cfg.cod ? "cod" : "");
   const [code, setCode] = useState("");
   const [coupon, setCoupon] = useState<{ code: string; discount: number } | null>(null);
@@ -39,7 +40,7 @@ export default function CheckoutForm({ cfg }: { cfg: { shipping: number; freeMin
       method: "POST",
       body: JSON.stringify({
         items: items.map((i) => ({ productId: i.productId, variantId: i.variantId, qty: i.qty })),
-        customer: f, payment_method: pay, coupon: coupon?.code,
+        customer: f, payment_method: pay, coupon: coupon?.code, session: (() => { try { return localStorage.getItem("sid") || ""; } catch { return ""; } })(),
       }),
     })).json();
     setBusy(false);
@@ -48,6 +49,26 @@ export default function CheckoutForm({ cfg }: { cfg: { shipping: number; freeMin
     router.push(`/order/${r.number}?t=${r.token}${pay === "online" ? "&pay=1" : ""}`);
   }
 
+  useEffect(() => {
+    if (!ready || !items.length) return;
+    try {
+      const m = JSON.parse(localStorage.getItem("boxMeta") || "null");
+      if (!m) return;
+      localStorage.removeItem("boxMeta");
+      if (m.note) setF((x: any) => ({ ...x, notes: x.notes ? x.notes + "\n" + m.note : m.note }));
+      if (m.coupon) fetch("/api/coupon", { method: "POST", body: JSON.stringify({ code: m.coupon, subtotal }) }).then((r) => r.json()).then((r) => { setCmsg(r.message); if (r.ok) { setCode(m.coupon); setCoupon({ code: m.coupon, discount: r.discount }); } });
+    } catch {}
+  }, [ready]); // eslint-disable-line
+  // remember the cart once we know how to reach the shopper (lets you follow up in Admin → Sources & carts)
+  useEffect(() => {
+    if (!ready || !items.length || (!f.email && String(f.phone).replace(/\D/g, "").length < 10)) return;
+    const t = setTimeout(() => {
+      let sid = ""; try { sid = localStorage.getItem("sid") || ""; if (!sid) { sid = Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("sid", sid); } } catch {}
+      fetch("/api/cart/capture", { method: "POST", body: JSON.stringify({ session: sid, name: f.name, email: f.email, phone: f.phone, items, total: subtotal }), keepalive: true }).catch(() => {});
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [ready, f.email, f.phone, f.name, items.length]); // eslint-disable-line
+  useEffect(() => { if (ready && items.length) track("begin_checkout", { items: items.map((i) => ({ id: i.productId, name: i.name, price: i.price, qty: i.qty })), value: subtotal }); }, [ready]); // eslint-disable-line
   if (!ready) return null;
   if (cfg.loginRequired)
     return <div className="py-24 text-center"><p className="text-neutral-600">Please sign in to place an order.</p><Link href="/account/login?next=/checkout" className="btn mt-4">Sign in / Create account</Link></div>;

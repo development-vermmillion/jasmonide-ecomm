@@ -57,6 +57,7 @@ type CartLine = { productId: number; variantId?: number | null; qty: number };
 
 export async function createOrder(input: {
   items: CartLine[]; customer: any; payment_method: string; coupon?: string; customerId?: number | null;
+  source?: { source?: string; medium?: string; campaign?: string }; session?: string;
 }) {
   const s = await getSettings();
   if (s.maintenance_mode === "1") throw new Error("The store is temporarily closed. Please try again later.");
@@ -111,12 +112,14 @@ export async function createOrder(input: {
   if (!cust && c.phone) cust = await one("select id from customers where phone = ?", [c.phone]);
   const customer_id = cust?.id ?? (await run("insert into customers (name,email,phone) values (?,?,?)", [c.name, c.email || "", c.phone || ""])).id;
 
+  await run("update customers set name = ? where id = ? and name = 'Customer'", [c.name, customer_id]);
   const tmp = "TMP" + Date.now() + Math.floor(Math.random() * 1000);
   const o = await run(
-    `insert into orders (number,customer_id,name,email,phone,address,city,state,pincode,subtotal,discount,bulk_discount,bulk_label,shipping,tax,total,coupon_code,payment_method,payment_status,status,notes)
-     values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'pending','pending',?)`,
+    `insert into orders (number,customer_id,name,email,phone,address,city,state,pincode,subtotal,discount,bulk_discount,bulk_label,shipping,tax,total,coupon_code,payment_method,payment_status,status,notes,source,medium,campaign)
+     values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'pending','pending',?,?,?,?)`,
     [tmp, customer_id, c.name, c.email || "", c.phone || "", c.address || "", c.city || "", c.state || "", c.pincode || "", subtotal, discount, bulk.discount, bulk.label, shipping, tax, total,
-      couponCode, input.payment_method || "cod", c.notes || ""]
+      couponCode, input.payment_method || "cod", c.notes || "",
+      (input.source?.source || "direct").slice(0, 40), (input.source?.medium || "").slice(0, 40), (input.source?.campaign || "").slice(0, 60)]
   );
   const number = "JM" + (1000 + o.id);
   await run("update orders set number = ? where id = ?", [number, o.id]);
@@ -127,6 +130,8 @@ export async function createOrder(input: {
   })));
   for (const m of await expandStock(lines)) await moveStock(m.product_id, m.variant_id, -m.qty, "Order placed", number);
   if (couponCode) await run("update coupons set used = used + 1 where code = ?", [couponCode]);
+  // follow-ups: never let these slow down or break the order
+  after_order(o.id, number, total, c, input.session).catch(() => {});
   return { id: o.id, number, total };
 }
 
@@ -161,4 +166,17 @@ export async function updateOrder(id: number, patch: any) {
         await moveStock(m.product_id, m.variant_id, isClosed ? m.qty : -m.qty, isClosed ? `Order ${patch.status} – stock restored` : "Order re-opened", cur.number);
     }
   }
+}
+
+async function after_order(id: number, number: string, total: number, c: any, session?: string) {
+  const { sendEmail, checkLowStock, alertOwner } = await import("./notify");
+  import("./backup").then((b) => b.maybeBackup()).catch(() => {});
+  const s = await getSettings();
+  // cart is no longer abandoned
+  await run("update abandoned_carts set recovered = 1 where (session != '' and session = ?) or (? != '' and email = ?) or (? != '' and phone = ?)", [session || "", c.email || "", c.email || "", c.phone || "", c.phone || ""]);
+  if (c.email && s.email_order_confirm === "1")
+    await sendEmail(c.email, `Your ${s.store_name} order ${number} is confirmed`,
+      `<div style="font:15px/1.6 system-ui;max-width:520px"><h2 style="font-family:Georgia,serif">Thank you, ${String(c.name).replace(/</g, "")} 💛</h2><p>We've received your order <b>${number}</b> (₹${total}). Every piece is packed by hand — we'll message you as soon as it ships.</p><p>Questions? Just reply to this email.</p><p>— ${s.store_name}</p></div>`);
+  if (s.alert_new_order === "1") await alertOwner(`New order ${number}`, `New order ${number} from ${c.name} (${c.phone || c.email}) — ₹${total}`, "order");
+  await checkLowStock();
 }

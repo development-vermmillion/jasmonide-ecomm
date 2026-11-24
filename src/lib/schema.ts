@@ -112,6 +112,20 @@ create table if not exists assistant_taught (
   id integer primary key autoincrement, question text not null, answer text not null, active integer default 1, hits integer default 0,
   created_at text default (datetime('now'))
 );
+create table if not exists otp_codes (
+  id integer primary key autoincrement, phone text not null, code_hash text not null, expires_at text not null,
+  attempts integer default 0, created_at text default (datetime('now'))
+);
+create table if not exists visits (
+  id integer primary key autoincrement, day text not null, source text not null, medium text default '', campaign text default '', n integer default 0,
+  unique(day, source, medium, campaign)
+);
+create table if not exists abandoned_carts (
+  id integer primary key autoincrement, session text not null unique, name text default '', email text default '', phone text default '',
+  items text default '[]', total real default 0, source text default '', recovered integer default 0, contacted integer default 0,
+  created_at text default (datetime('now')), updated_at text default (datetime('now'))
+);
+create table if not exists alerts_sent (id integer primary key autoincrement, key text not null, day text not null, unique(key, day));
 create index if not exists idx_products_cat on products(category_id);
 create index if not exists idx_orders_created on orders(created_at);
 create index if not exists idx_items_order on order_items(order_id);

@@ -11,6 +11,7 @@ export const metadata = { title: "Admin" };
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const s = await getSession();
   if (!s) redirect("/admin/login");
+  import("@/lib/backup").then((b) => b.maybeBackup()).catch(() => {});
   const [st, o, r, i, rv] = await Promise.all([
     getSettings(),
     one("select count(*) n from orders where status in ('pending','confirmed','processing')"),

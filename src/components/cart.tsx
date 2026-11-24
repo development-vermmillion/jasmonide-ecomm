@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@/lib/track-client";
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 
 export type CartItem = {
@@ -37,6 +38,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       return [...cur, { ...i, key, qty: Math.min(qty, i.max) }];
     });
     setOpen(true);
+    track("add_to_cart", { items: [{ id: i.productId, name: i.name, price: i.price, qty }], value: i.price * qty });
   }, []);
   const setQty = useCallback((key: string, qty: number) =>
     setItems((cur) => cur.map((x) => (x.key === key ? { ...x, qty: Math.max(1, Math.min(qty, x.max)) } : x))), []);

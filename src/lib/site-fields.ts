@@ -1,5 +1,5 @@
 /** Editable-content fields (Admin → Brand & SEO, Admin → Homepage). Key → default. */
-export type Field = { key: string; label: string; def: string; type?: "text" | "area" | "image" | "toggle" | "url" | "secret" | "select"; options?: [string, string][]; help?: string };
+export type Field = { key: string; label: string; def: string; type?: "text" | "area" | "image" | "toggle" | "url" | "secret" | "select"; options?: [string, string][]; help?: string; rows?: number };
 export type FieldGroup = { title: string; note?: string; fields: Field[] };
 
 export const BRAND_SEO: FieldGroup[] = [
@@ -21,8 +21,6 @@ export const BRAND_SEO: FieldGroup[] = [
     { key: "seo_noindex", label: "Hide whole site from Google (use while testing)", def: "0", type: "toggle" },
     { key: "google_verification", label: "Google Search Console verification code", def: "" },
     { key: "bing_verification", label: "Bing Webmaster verification code", def: "" },
-    { key: "ga_id", label: "Google Analytics ID (G-XXXXXXX)", def: "" },
-    { key: "meta_pixel_id", label: "Meta (Facebook/Instagram) Pixel ID", def: "" },
     { key: "org_sameas", label: "Other profiles (one URL per line, for Google)", def: "", type: "area" },
     { key: "business_type_note", label: "Business location line for local SEO (city, state)", def: "" },
   ] },
@@ -100,7 +98,7 @@ export const HOME: FieldGroup[] = [
 
 
 /** Keys that must never be sent to the browser (kept server-side only). */
-export const SECRET_KEYS = ["razorpay_key_secret", "razorpay_webhook_secret"];
+export const SECRET_KEYS = ["razorpay_key_secret", "razorpay_webhook_secret", "cashfree_secret_key", "payu_salt", "shiprocket_password", "delhivery_token", "smtp_pass", "wa_access_token", "google_client_secret", "msg91_authkey", "twilio_token", "ig_access_token"];
 
 export const PAYMENTS: FieldGroup[] = [
   { title: "Payment methods", note: "Turn each method on or off. Customers only see the methods that are on.", fields: [
@@ -153,4 +151,124 @@ export const BUSINESS: FieldGroup[] = [
   ] },
 ];
 
-export const SITE_DEFAULTS: Record<string, string> = Object.fromEntries([...BRAND_SEO, ...ASSISTANT, ...HOME, ...PAYMENTS, ...BUSINESS].flatMap((g) => g.fields.map((f) => [f.key, f.def])));
+
+import { LEGAL_PAGES } from "./legal";
+
+export const LEGAL: FieldGroup[] = [
+  { title: "Legal pages", note: "Sample text is already filled in for an Indian online store — read it, replace anything that doesn't match your business, and ideally have a lawyer/CA check it. Use {{store}}, {{email}}, {{phone}}, {{address}}, {{legal_name}}, {{return_days}}, {{free_shipping_min}}, {{shipping_flat}} and {{updated}} to insert your details automatically. Formatting: ## Heading, - bullet, **bold**.", fields: [
+    { key: "legal_updated", label: "“Last updated” date shown on the pages", def: "24 November 2026" },
+    { key: "cookie_banner_enabled", label: "Show the cookie notice banner", def: "1", type: "toggle" },
+    { key: "cookie_banner_text", label: "Cookie banner text", def: "We use cookies to keep your bag working, understand what you love and measure our ads. You can choose.", type: "area" },
+  ] },
+  ...LEGAL_PAGES.map((p) => ({ title: p.title, note: `Shown at /page/${p.slug}`, fields: [{ key: p.key, label: p.title + " (full text)", def: p.def, type: "area" as const, rows: 16 }] })),
+];
+
+const SEL_OTP: [string, string][] = [["test", "Test mode — show the code on screen (for testing only!)"], ["msg91", "MSG91 (SMS)"], ["twilio", "Twilio (SMS)"], ["whatsapp", "WhatsApp (Meta Cloud API, set up below)"]];
+export const INTEGRATIONS: FieldGroup[] = [
+  { title: "Customer sign-in", note: "How customers log in to their account. Turn each method on or off.", fields: [
+    { key: "login_otp_enabled", label: "Sign in with phone OTP", def: "1", type: "toggle" },
+    { key: "login_google_enabled", label: "Sign in with Google (Gmail)", def: "0", type: "toggle" },
+    { key: "login_password_enabled", label: "Sign in with email + password", def: "1", type: "toggle" },
+  ] },
+  { title: "Google sign-in (Gmail)", note: "Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID (Web application). Add the redirect URL shown below. Change these any time to use another Google account/project.", fields: [
+    { key: "google_client_id", label: "Google Client ID", def: "" },
+    { key: "google_client_secret", label: "Google Client secret", def: "", type: "secret" },
+    { key: "google_redirect_note", label: "Redirect URL to add in Google (copy this)", def: "https://YOUR-SITE/api/account/google/callback", help: "Replace YOUR-SITE with your real website address. For local testing use http://localhost:3000/api/account/google/callback" },
+  ] },
+  { title: "Phone OTP (SMS / WhatsApp)", note: "Choose how OTP codes are delivered. Test mode shows the code on screen so you can try the flow — switch it before going live.", fields: [
+    { key: "otp_provider", label: "OTP delivery", def: "test", type: "select", options: SEL_OTP },
+    { key: "msg91_authkey", label: "MSG91 auth key", def: "", type: "secret" },
+    { key: "msg91_template_id", label: "MSG91 OTP template ID", def: "" },
+    { key: "twilio_sid", label: "Twilio account SID", def: "" },
+    { key: "twilio_token", label: "Twilio auth token", def: "", type: "secret" },
+    { key: "twilio_from", label: "Twilio sender number", def: "" },
+  ] },
+  { title: "Email (SMTP)", note: "Used for order emails and alerts. Gmail: smtp.gmail.com, port 587, your Gmail address, and an App Password (Google Account → Security → App passwords). Leave off until ready.", fields: [
+    { key: "email_enabled", label: "Send emails from the store", def: "0", type: "toggle" },
+    { key: "email_order_confirm", label: "Email customers when they place an order", def: "1", type: "toggle" },
+    { key: "smtp_host", label: "SMTP host", def: "smtp.gmail.com" },
+    { key: "smtp_port", label: "SMTP port", def: "587" },
+    { key: "smtp_user", label: "SMTP username (your email)", def: "" },
+    { key: "smtp_pass", label: "SMTP password / app password", def: "", type: "secret" },
+    { key: "email_from_name", label: "From name", def: "Jasmonoide" },
+    { key: "email_from", label: "From email address", def: "" },
+  ] },
+  { title: "WhatsApp Business API", note: "Meta WhatsApp Cloud API (developers.facebook.com). Needed for automatic WhatsApp messages, alerts and OTP. Message templates must be approved in Meta first.", fields: [
+    { key: "wa_api_enabled", label: "Send WhatsApp messages from the store", def: "0", type: "toggle" },
+    { key: "wa_phone_number_id", label: "Phone number ID", def: "" },
+    { key: "wa_access_token", label: "Permanent access token", def: "", type: "secret" },
+    { key: "wa_template_lang", label: "Template language code", def: "en" },
+    { key: "wa_otp_template", label: "OTP template name", def: "otp_login" },
+    { key: "wa_alert_template", label: "Alert template name (stock & new-order alerts)", def: "store_alert" },
+    { key: "wa_order_template", label: "Order-update template name", def: "order_update" },
+  ] },
+  { title: "Shipping", note: "Fill these when you pick a shipping partner. Until then you ship manually and add the tracking number on each order.", fields: [
+    { key: "shipping_provider", label: "Shipping partner", def: "manual", type: "select", options: [["manual", "Manual (I book couriers myself)"], ["shiprocket", "Shiprocket"], ["delhivery", "Delhivery"], ["other", "Other"]] },
+    { key: "shiprocket_email", label: "Shiprocket login email", def: "" },
+    { key: "shiprocket_password", label: "Shiprocket API password", def: "", type: "secret" },
+    { key: "delhivery_token", label: "Delhivery API token", def: "", type: "secret" },
+    { key: "pickup_name", label: "Pickup location name", def: "Studio" },
+    { key: "pickup_pincode", label: "Pickup pincode", def: "" },
+    { key: "pickup_address", label: "Pickup address", def: "", type: "area" },
+    { key: "shipping_note", label: "Delivery promise shown on product pages", def: "Dispatched in 2–3 working days · delivered in 3–7 days across India" },
+    { key: "shipping_flat", label: "Flat shipping charge (₹)", def: "79" },
+    { key: "free_shipping_min", label: "Free shipping above (₹)", def: "999" },
+  ] },
+  { title: "More payment gateways (saved for later)", note: "Razorpay is already live in Admin → Payments. These are stored so they're ready when you connect another gateway.", fields: [
+    { key: "cashfree_app_id", label: "Cashfree App ID", def: "" },
+    { key: "cashfree_secret_key", label: "Cashfree secret key", def: "", type: "secret" },
+    { key: "payu_merchant_key", label: "PayU merchant key", def: "" },
+    { key: "payu_salt", label: "PayU salt", def: "", type: "secret" },
+  ] },
+  { title: "Alerts to you", note: "Get told when stock runs low or an order arrives. Needs Email or WhatsApp above to be set up. Each product's “low stock” level is set on the product.", fields: [
+    { key: "alert_low_stock_email", label: "Low-stock alerts by email", def: "1", type: "toggle" },
+    { key: "alert_low_stock_whatsapp", label: "Low-stock alerts on WhatsApp", def: "0", type: "toggle" },
+    { key: "alert_new_order", label: "Also alert me on every new order", def: "1", type: "toggle" },
+    { key: "alert_email", label: "Send alerts to this email", def: "" },
+    { key: "alert_whatsapp", label: "Send alerts to this WhatsApp number (with country code, e.g. 919876543210)", def: "" },
+  ] },
+  { title: "Automatic database backups", note: "A copy of your store data (products, orders, customers, settings) is saved on the server automatically. Download copies from Admin → Backups and keep them somewhere safe (Google Drive, laptop).", fields: [
+    { key: "backup_enabled", label: "Back up automatically", def: "1", type: "toggle" },
+    { key: "backup_every_hours", label: "Back up every (hours)", def: "24" },
+    { key: "backup_keep", label: "Keep the latest (how many backups)", def: "14" },
+  ] },
+];
+
+export const MARKETING: FieldGroup[] = [
+  { title: "Tracking (Google Analytics & Meta Pixel)", note: "Paste your IDs and the site starts measuring visitors and ads. Events sent: PageView, ViewContent, AddToCart, InitiateCheckout, Purchase.", fields: [
+    { key: "ga_id", label: "Google Analytics 4 ID (G-XXXXXXXXXX)", def: "" },
+    { key: "meta_pixel_id", label: "Meta (Facebook/Instagram) Pixel ID", def: "" },
+    { key: "track_events", label: "Send shop events (view product, add to bag, checkout, purchase)", def: "1", type: "toggle" },
+  ] },
+  { title: "Instagram feed on the homepage", note: "Without an access token, the feed shows your latest reels from Admin → Instagram reels. With a token it shows your real latest Instagram posts. Token: Meta developers → Instagram API → generate a long-lived token for your professional account.", fields: [
+    { key: "show_ig_feed", label: "Show Instagram feed on the homepage", def: "1", type: "toggle" },
+    { key: "ig_feed_title", label: "Heading", def: "Follow our little studio" },
+    { key: "ig_user_id", label: "Instagram user ID (for live feed)", def: "" },
+    { key: "ig_access_token", label: "Instagram access token (for live feed)", def: "", type: "secret" },
+  ] },
+  { title: "WhatsApp shopping", fields: [
+    { key: "wa_order_button", label: "“Order on WhatsApp” button on product pages", def: "1", type: "toggle" },
+    { key: "wa_cart_button", label: "“Send my bag on WhatsApp” button in the cart", def: "1", type: "toggle" },
+    { key: "wa_order_text", label: "Message template ({product} and {link} are filled in)", def: "Hi {store}! I'd love to order: {product} {link}" },
+  ] },
+  { title: "Product feeds (Google Shopping, Instagram/Facebook Shop, WhatsApp Catalogue)", note: "Feeds update automatically when your products change. Needs “Website address” in Admin → Brand & SEO.", fields: [
+    { key: "feeds_enabled", label: "Enable product feeds", def: "1", type: "toggle" },
+    { key: "feed_brand", label: "Brand name in feeds", def: "Jasmonoide" },
+    { key: "feed_google_category", label: "Google product category", def: "Home & Garden > Decor" },
+  ] },
+  { title: "Mood finder quiz", fields: [
+    { key: "quiz_enabled", label: "Show the mood finder quiz", def: "1", type: "toggle" },
+    { key: "quiz_title", label: "Heading", def: "Find the candle that feels like you" },
+    { key: "quiz_intro", label: "Intro text", def: "Three quick questions, one little glow made just for your mood." },
+  ] },
+  { title: "Build-your-own gift box", fields: [
+    { key: "box_enabled", label: "Show the gift box builder", def: "1", type: "toggle" },
+    { key: "box_title", label: "Heading", def: "Build a box that says it for you" },
+    { key: "box_intro", label: "Intro text", def: "Pick your favourites, add a handwritten note, and we'll wrap it all in our kraft gift box." },
+    { key: "box_slots", label: "Items per box", def: "3" },
+    { key: "box_discount", label: "Box discount (%)", def: "10" },
+    { key: "box_note", label: "Packaging line", def: "Wrapped in a kraft box with twine and a handwritten card — free." },
+  ] },
+];
+
+export const SITE_DEFAULTS: Record<string, string> = Object.fromEntries([...BRAND_SEO, ...ASSISTANT, ...HOME, ...PAYMENTS, ...BUSINESS, ...LEGAL, ...INTEGRATIONS, ...MARKETING].flatMap((g) => g.fields.map((f) => [f.key, f.def])));

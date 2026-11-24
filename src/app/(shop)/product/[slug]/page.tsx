@@ -46,7 +46,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         {p.category_name && <><ChevronRight size={12} className="mx-1 inline" /><Link href={`/category/${p.category_slug}`} className="hover:underline">{p.category_name}</Link></>}
       </div>
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-6 sm:px-6 lg:grid-cols-2">
-        <ProductView p={view} whatsapp={s.whatsapp}>
+        <ProductView p={view} whatsapp={s.whatsapp} waOrder={s.wa_order_button === "1" ? { text: s.wa_order_text, store: s.store_name } : null} shipNote={s.shipping_note}>
           <p className="eyebrow">{p.category_name || (p.type === "combo" ? "Combo" : "")}</p>
           <h1 className="h-serif mt-1 text-3xl sm:text-4xl">{p.name}</h1>
           {p.spec_line && <p className="mt-1 text-neutral-500">{p.spec_line}</p>}

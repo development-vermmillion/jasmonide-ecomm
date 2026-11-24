@@ -10,6 +10,7 @@ import { getSettings } from "@/lib/catalog";
 import { orderToken } from "@/lib/token";
 import { returnEligibility } from "@/lib/returns";
 import ReturnForm from "@/components/ReturnForm";
+import TrackEvent from "@/components/TrackEvent";
 import { inr, fdatetime } from "@/lib/util";
 
 export const metadata = { title: "Order confirmed" };
@@ -30,6 +31,7 @@ export default async function OrderPage({ params, searchParams }: { params: { nu
   const elig = returnEligibility(o, s, !!ret);
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+      <TrackEvent event="purchase" once id={o.number} value={o.total} items={items.map((i: any) => ({ id: i.product_id, name: i.name, price: i.price, qty: i.qty }))} />
       <span className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-mint text-green-700"><CheckCircle2 size={30} /></span>
       <p className="eyebrow">Thank you, {o.name?.split(" ")[0]}</p>
       <h1 className="h-serif mt-1 text-3xl sm:text-4xl">Your order is on its way to becoming a memory</h1>

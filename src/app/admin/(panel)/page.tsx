@@ -10,7 +10,7 @@ import MetricToggle from "@/components/admin/MetricToggle";
 const pct = (a: number, b: number) => (b ? ((a - b) / b) * 100 : a ? 100 : null);
 const rangeLabel = (n: number) => (n === 7 ? "Week" : n === 30 ? "Month" : "Quarter");
 
-export default async function Dashboard({ searchParams }: { searchParams: { days?: string } }) {
+export default async function Dashboard({ searchParams }: { searchParams: { days?: string; denied?: string } }) {
   const days = [7, 30, 90].includes(Number(searchParams.days)) ? Number(searchParams.days) : 30;
   const [d, st] = await Promise.all([dashboardStats(days), getSettings()]);
   const vs = `vs previous ${days} days`;

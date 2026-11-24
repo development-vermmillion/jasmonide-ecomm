@@ -1,4 +1,5 @@
 "use client";
+import WaCart from "./WaCart";
 import { useBulk } from "./useBulk";
 import { ShoppingBag, X, Truck, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -63,6 +64,7 @@ export function CartDrawer({ freeMin }: { freeMin: number }) {
               {bulk.discount > 0 && <div className="mb-3 flex justify-between text-sm text-green-700"><span>{bulk.label}</span><span>−{inr(bulk.discount)}</span></div>}
               <p className="mb-3 text-xs text-neutral-500">Shipping and taxes calculated at checkout.</p>
               <Link href="/checkout" onClick={() => setOpen(false)} className="btn w-full">Checkout <ArrowRight size={16} /></Link>
+              <WaCart className="mt-2 w-full" />
               <Link href="/cart" onClick={() => setOpen(false)} className="mt-2 block text-center text-xs underline">View full bag</Link>
             </div>
           </>

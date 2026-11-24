@@ -39,6 +39,8 @@ export default async function Footer() {
           <ul className="space-y-2 text-sm">
             {s.accounts_enabled === "1" && <li><Link href="/account" className="hover:underline">My account</Link></li>}
             {s.track_enabled === "1" && <li><Link href="/track" className="hover:underline">Track your order</Link></li>}
+            {s.quiz_enabled === "1" && <li><Link href="/mood-finder" className="hover:underline">Mood finder</Link></li>}
+            {s.box_enabled === "1" && <li><Link href="/build-a-box" className="hover:underline">Build a gift box</Link></li>}
             {s.wishlist_enabled === "1" && <li><Link href="/wishlist" className="hover:underline">Wishlist</Link></li>}
             {s.blog_enabled === "1" && <li><Link href="/blog" className="hover:underline">Blog</Link></li>}
             {s.faq_enabled === "1" && <li><Link href="/faq" className="hover:underline">FAQ</Link></li>}
@@ -46,6 +48,7 @@ export default async function Footer() {
             {s.returns_enabled === "1" && <li><Link href="/page/refund" className="hover:underline">Return &amp; refund policy</Link></li>}
             <li><Link href="/page/privacy" className="hover:underline">Privacy policy</Link></li>
             <li><Link href="/page/terms" className="hover:underline">Terms of service</Link></li>
+            <li><Link href="/page/cookies" className="hover:underline">Cookie policy</Link></li>
             <li><Link href="/page/contact" className="hover:underline">Contact</Link></li>
           </ul>
         </div>

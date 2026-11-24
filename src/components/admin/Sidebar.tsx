@@ -1,16 +1,17 @@
 "use client";
 import Link from "next/link";
-import { LayoutDashboard, BarChart3, Package, Layers, FolderTree, Warehouse, Percent, ShoppingCart, Users, Ticket, Settings, UserCog, CreditCard, FileText, Film, Star, Sparkles, Globe, Home, BookOpen, HelpCircle, Undo2, Inbox, LogOut, ExternalLink, Menu, X } from "lucide-react";
+import { LayoutDashboard, BarChart3, Package, Layers, FolderTree, Warehouse, Percent, ShoppingCart, Users, Ticket, Settings, UserCog, CreditCard, FileText, Film, Star, Plug, Scale, Megaphone, Radar, FileSpreadsheet, DatabaseBackup, Sparkles, Globe, Home, BookOpen, HelpCircle, Undo2, Inbox, LogOut, ExternalLink, Menu, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { canViewPage } from "@/lib/roles";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const NAV = [
   ["Overview", [["/admin", "Dashboard", LayoutDashboard], ["/admin/reports", "Sales reports", BarChart3]]],
-  ["Catalogue", [["/admin/products", "Products", Package], ["/admin/products?type=combo", "Combos", Layers], ["/admin/categories", "Categories", FolderTree], ["/admin/inventory", "Inventory & stock", Warehouse], ["/admin/offers", "Sales & offers", Percent], ["/admin/bulk", "Bulk discounts", Layers]]],
-  ["Sales", [["/admin/orders", "Orders", ShoppingCart], ["/admin/customers", "Customers", Users], ["/admin/coupons", "Coupons", Ticket], ["/admin/payments", "Payments", CreditCard], ["/admin/returns", "Returns & refunds", Undo2]]],
+  ["Catalogue", [["/admin/products", "Products", Package], ["/admin/products?type=combo", "Combos", Layers], ["/admin/categories", "Categories", FolderTree], ["/admin/inventory", "Inventory & stock", Warehouse], ["/admin/offers", "Sales & offers", Percent], ["/admin/bulk", "Bulk discounts", Layers], ["/admin/import-export", "Import / export", FileSpreadsheet]]],
+  ["Sales", [["/admin/orders", "Orders", ShoppingCart], ["/admin/customers", "Customers", Users], ["/admin/coupons", "Coupons", Ticket], ["/admin/payments", "Payments", CreditCard], ["/admin/sources", "Sources & carts", Radar], ["/admin/returns", "Returns & refunds", Undo2]]],
   ["Engagement", [["/admin/reels", "Instagram reels", Film], ["/admin/reviews", "Reviews", Star], ["/admin/assistant", "AI assistant", Sparkles], ["/admin/inbox", "Inbox & leads", Inbox]]],
-  ["Store", [["/admin/homepage", "Homepage content", Home], ["/admin/brand", "Brand, SEO & AI", Globe], ["/admin/blog", "Blog", BookOpen], ["/admin/faqs", "FAQs", HelpCircle], ["/admin/invoice-settings", "Invoice & GST", FileText], ["/admin/settings", "Settings & switches", Settings], ["/admin/users", "Team & users", UserCog]]],
+  ["Store", [["/admin/homepage", "Homepage content", Home], ["/admin/brand", "Brand, SEO & AI", Globe], ["/admin/marketing", "Marketing & tools", Megaphone], ["/admin/legal", "Legal pages", Scale], ["/admin/blog", "Blog", BookOpen], ["/admin/faqs", "FAQs", HelpCircle], ["/admin/invoice-settings", "Invoice & GST", FileText], ["/admin/settings", "Settings & switches", Settings], ["/admin/integrations", "Integrations", Plug], ["/admin/backups", "Backups", DatabaseBackup], ["/admin/users", "Team & roles", UserCog]]],
 ] as const;
 
 export default function Sidebar({ name, role, store, logo, counts }: { name: string; role: string; store: string; logo?: string; counts: Record<string, number> }) {
@@ -31,7 +32,7 @@ export default function Sidebar({ name, role, store, logo, counts }: { name: str
       </div>
       <div className="mx-5 border-t border-[var(--adm-line)]" />
       <nav className="no-scrollbar flex-1 space-y-4 overflow-y-auto px-3 py-4">
-        {NAV.map(([group, links]) => (
+        {NAV.map(([group, all]) => { const links = all.filter(([h]) => canViewPage(role, h.split("?")[0])); return links.length === 0 ? null : (
           <div key={group}>
             <p className="px-3 pb-1.5 text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--adm-muted)]">{group}</p>
             {links.map(([href, label, Icon]) => {
@@ -47,7 +48,7 @@ export default function Sidebar({ name, role, store, logo, counts }: { name: str
               );
             })}
           </div>
-        ))}
+        ); })}
       </nav>
       <div className="m-3 rounded-2xl bg-[rgb(var(--c-ink)/.04)] p-3">
         <div className="flex items-center gap-2.5">

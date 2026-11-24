@@ -6,6 +6,8 @@ import Rail from "@/components/Rail";
 import TabbedRail from "@/components/TabbedRail";
 import Reveal from "@/components/Reveal";
 import ReelsSection from "@/components/ReelsSection";
+import IgFeed from "@/components/IgFeed";
+import { Sparkles, Gift } from "lucide-react";
 import { fdate } from "@/lib/util";
 
 const RING = ["ring-blush", "ring-mint", "ring-sky", "ring-butter", "ring-lilac", "ring-peach"];
@@ -73,6 +75,15 @@ export default async function Home() {
         </section></Reveal>
       )}
 
+      {(on("quiz_enabled") || on("box_enabled")) && (
+        <Reveal><section className="mx-auto max-w-7xl px-4 pt-2 sm:px-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {on("quiz_enabled") && <Link href="/mood-finder" className="rv-item sf-lift group flex items-center gap-4 rounded-2xl bg-lilac/70 p-5 sm:p-6"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-plum"><Sparkles size={22} /></span><div className="min-w-0"><p className="h-serif text-xl">{s.quiz_title}</p><p className="text-sm text-neutral-600">Take the 30-second mood quiz</p></div><ArrowRight size={18} className="ml-auto shrink-0 transition group-hover:translate-x-1" /></Link>}
+            {on("box_enabled") && <Link href="/build-a-box" style={{ ["--i" as any]: 1 }} className="rv-item sf-lift group flex items-center gap-4 rounded-2xl bg-blush/70 p-5 sm:p-6"><span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-plum"><Gift size={22} /></span><div className="min-w-0"><p className="h-serif text-xl">{s.box_title}</p><p className="text-sm text-neutral-600">Pick favourites · add a handwritten card</p></div><ArrowRight size={18} className="ml-auto shrink-0 transition group-hover:translate-x-1" /></Link>}
+          </div>
+        </section></Reveal>
+      )}
+
       {on("show_categories") && (
         <Reveal><section className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-12">
           <p className="eyebrow">{s.cat_eyebrow}</p><h2 className="h-serif mt-1 text-2xl sm:text-3xl">{s.cat_title}</h2>
@@ -116,6 +127,8 @@ export default async function Home() {
           <div className="grid gap-4 sm:grid-cols-3">{posts.map((p: any) => <Link key={p.slug} href={`/blog/${p.slug}`} className="group"><span className="block overflow-hidden rounded-xl"><img src={p.cover || placeholder(p.title)} alt="" loading="lazy" className="aspect-[16/10] w-full object-cover transition duration-700 group-hover:scale-105" /></span><p className="mt-2 text-xs text-neutral-500">{fdate(p.created_at)}</p><p className="font-medium group-hover:underline">{p.title}</p></Link>)}</div>
         </section></Reveal>
       )}
+
+      <IgFeed />
 
       {on("show_story") && (
         <Reveal><section className="mx-auto my-8 max-w-7xl px-4 sm:px-6">

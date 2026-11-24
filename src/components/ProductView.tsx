@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, ShoppingBag, Zap, XCircle, AlertTriangle, Download, CheckCircle2, Truck, Banknote, Headset, Share2, Check } from "lucide-react";
 import { useCart } from "./cart";
+import TrackEvent from "./TrackEvent";
 import { HeartButton } from "./wishlist";
 import NotifyForm from "./NotifyForm";
 import { WhatsAppIcon } from "./social";
@@ -18,7 +19,7 @@ function saleOn(o: any, p: any) {
   return true;
 }
 
-export default function ProductView({ p, whatsapp, children }: { p: any; whatsapp: string; children: React.ReactNode }) {
+export default function ProductView({ p, whatsapp, waOrder, shipNote, children }: { p: any; whatsapp: string; waOrder?: { text: string; store: string } | null; shipNote?: string; children: React.ReactNode }) {
   const { add } = useCart();
   const router = useRouter();
   const [img, setImg] = useState(0);
@@ -63,6 +64,7 @@ export default function ProductView({ p, whatsapp, children }: { p: any; whatsap
 
   return (
     <>
+      <TrackEvent event="view_item" id={String(p.id)} value={p.display_price || p.price || 0} items={[{ id: p.id, name: p.name, price: p.display_price || p.price || 0 }]} />
       <div>
         <div className={`relative aspect-square overflow-hidden rounded-2xl ${TINTS[p.id % 6]}`}>
           <img key={img} src={p.imgs[img]} alt={p.name} className="h-full w-full animate-[fadeIn_.4s_ease] object-cover" />
@@ -134,6 +136,8 @@ export default function ProductView({ p, whatsapp, children }: { p: any; whatsap
         )}
         {err && <p className="mt-2 text-sm text-red-600">{err}</p>}
 
+        {waOrder && <a href={`https://wa.me/${whatsapp}?text=${encodeURIComponent(waOrder.text.replace("{store}", waOrder.store).replace("{product}", p.name).replace("{link}", typeof window !== "undefined" ? location.href : ""))}`} target="_blank" className="btn-outline mt-3 w-full"><WhatsAppIcon size={16} className="text-[#25D366]" /> Order on WhatsApp</a>}
+        {shipNote && <p className="mt-3 text-xs text-neutral-500">🚚 {shipNote}</p>}
         <a href={`https://wa.me/${whatsapp}?text=${encodeURIComponent("Hi, I have a question about " + p.name)}`} target="_blank" className="mt-5 inline-flex items-center gap-2 text-sm underline underline-offset-4">
           <WhatsAppIcon size={16} className="text-[#25D366]" /> Questions or bulk order? Chat on WhatsApp
         </a>

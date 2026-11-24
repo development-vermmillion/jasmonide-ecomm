@@ -1,6 +1,7 @@
 "use client";
 import { useBulk } from "@/components/useBulk";
 import { ShoppingBag, Trash2, Minus, Plus, ArrowRight } from "lucide-react";
+import WaCart from "@/components/WaCart";
 import Link from "next/link";
 import { useCart } from "@/components/cart";
 import { inr } from "@/lib/util";
@@ -40,6 +41,7 @@ export default function CartPage() {
             {bulk.discount > 0 && <p className="text-sm text-green-700">{bulk.label}: −{inr(bulk.discount)}</p>}
             <p className="text-xs text-neutral-500">Shipping, coupons and taxes at checkout.</p>
             <Link href="/checkout" className="btn mt-2">Proceed to checkout <ArrowRight size={16} /></Link>
+            <WaCart className="mt-2" />
           </div>
         </>
       )}

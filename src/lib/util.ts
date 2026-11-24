@@ -37,3 +37,22 @@ export function toCSV(rows: any[]): string {
   };
   return [cols.join(","), ...rows.map((r) => cols.map((c) => esc(r[c])).join(","))].join("\n");
 }
+
+/** Minimal RFC-4180 CSV parser (quotes, commas and newlines inside quotes). Returns objects keyed by the header row. */
+export function parseCSV(text: string): Record<string, string>[] {
+  const rows: string[][] = [];
+  let row: string[] = [], cur = "", q = false;
+  const s = text.replace(/^﻿/, "");
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (q) { if (c === '"') { if (s[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === ",") { row.push(cur); cur = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && s[i + 1] === "\n") i++; row.push(cur); cur = ""; if (row.some((x) => x.trim() !== "")) rows.push(row); row = []; }
+    else cur += c;
+  }
+  row.push(cur); if (row.some((x) => x.trim() !== "")) rows.push(row);
+  if (!rows.length) return [];
+  const head = rows[0].map((h) => h.trim().toLowerCase());
+  return rows.slice(1).map((r) => Object.fromEntries(head.map((h, i) => [h, (r[i] ?? "").trim()])));
+}

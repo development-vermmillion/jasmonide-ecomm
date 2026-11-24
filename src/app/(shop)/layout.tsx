@@ -6,6 +6,8 @@ import ScrollExtras from "@/components/ScrollExtras";
 import AssistantWidget from "@/components/AssistantWidget";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Tracker from "@/components/Tracker";
+import CookieBanner from "@/components/CookieBanner";
 import { getSettings } from "@/lib/catalog";
 import { cookies } from "next/headers";
 import { Wrench } from "lucide-react";
@@ -32,6 +34,8 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
         <Footer />
         <CartDrawer freeMin={Number(s.free_shipping_min)} />
         <ScrollExtras />
+        <Tracker />
+        {s.cookie_banner_enabled === "1" && <CookieBanner text={s.cookie_banner_text} />}
         {s.assistant_enabled === "1" && <AssistantWidget name={s.assistant_name} greeting={s.assistant_greeting} />}
         {s.whatsapp_button === "1" && (
           <a href={`https://wa.me/${s.whatsapp}`} target="_blank" aria-label="WhatsApp"
