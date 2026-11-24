@@ -75,6 +75,17 @@ export const HOME: FieldGroup[] = [
     { key: "proj2_title", label: "Project 2 title", def: "A cosy corner just for you" }, { key: "proj2_image", label: "Project 2 image", def: "", type: "image" }, { key: "proj2_link", label: "Project 2 link", def: "/blog" },
     { key: "proj3_title", label: "Project 3 title", def: "Pour your very first jesmonite vessel" }, { key: "proj3_image", label: "Project 3 image", def: "", type: "image" }, { key: "proj3_link", label: "Project 3 link", def: "/blog" },
   ] },
+  { title: "About the brand (right after categories)", note: "A personal letter from you. Write it in your own voice — real stories connect more than polished ones.", fields: [
+    { key: "show_about", label: "Show this section", def: "1", type: "toggle" },
+    { key: "about_eyebrow", label: "Small label", def: "Our story" },
+    { key: "about_title", label: "Heading", def: "This isn't just a shop. It's my very first dream." },
+    { key: "about_text", label: "Your story (blank line = new paragraph)", def: "Jasmonoide started in a corner of my home, with a pot of wax, a lot of mess and a quiet promise to myself: I wanted to build something of my own.\n\nThere were evenings when the pour cracked, the candle sank, and I almost gave up. And then there were evenings when a candle came out perfect, the room filled with warmth, and I remembered exactly why I began.\n\nEvery candle and every jesmonite piece you see here is made by hand, in small batches, with patience. This is my first brand and my first struggle — and also the hustle I love waking up for.\n\nWhen you choose us, you're not just buying a product. You're cheering on a small dream, and you become part of our very first chapter. Thank you for being here.", type: "area", rows: 10 },
+    { key: "about_quote", label: "Highlighted line", def: "Small batches. Big heart. Made with love, one pour at a time." },
+    { key: "about_name", label: "Signature (your name)", def: "— The maker, Jasmonoide" },
+    { key: "about_image", label: "Photo (studio, your hands pouring, workspace)", def: "/brand/studio.jpg", type: "image" },
+    { key: "about_p1", label: "Promise 1", def: "Poured by hand" }, { key: "about_p2", label: "Promise 2", def: "Small batches, never mass-made" }, { key: "about_p3", label: "Promise 3", def: "Packed with love" },
+    { key: "about_cta", label: "Button text (leave blank to hide)", def: "Find your glow" }, { key: "about_link", label: "Button link", def: "/shop" },
+  ] },
   { title: "Brand story", fields: [
     { key: "show_story", label: "Show this section", def: "1", type: "toggle" },
     { key: "story_title", label: "Heading", def: "Made slowly, for the moments that matter" },

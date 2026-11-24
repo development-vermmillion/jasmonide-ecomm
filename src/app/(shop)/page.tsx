@@ -98,6 +98,26 @@ export default async function Home() {
         </section></Reveal>
       )}
 
+      {on("show_about") && (
+        <Reveal><section className="mx-auto max-w-7xl px-4 pb-4 sm:px-6">
+          <div className="grid items-center gap-8 overflow-hidden rounded-3xl bg-gradient-to-br from-blush/70 via-butter/50 to-lilac/60 p-5 sm:p-10 md:grid-cols-5 md:gap-12">
+            <div className="relative md:col-span-2">
+              <img src={s.about_image || "/brand/studio.jpg"} alt="Where Jasmonoide is made" loading="lazy" className="aspect-[4/5] w-full rounded-2xl object-cover shadow-lg md:-rotate-2" />
+              <span className="absolute -bottom-3 right-3 rounded-full bg-white px-4 py-1.5 text-xs font-medium shadow-md sm:right-6">🕯️ Our very first chapter</span>
+            </div>
+            <div className="md:col-span-3">
+              <p className="eyebrow">{s.about_eyebrow}</p>
+              <h2 className="h-serif mt-1 text-2xl leading-tight sm:text-4xl">{s.about_title}</h2>
+              <div className="mt-4 space-y-3 text-[15px] leading-relaxed text-neutral-700">{String(s.about_text || "").split(/\n\s*\n/).map((t, i) => <p key={i}>{t}</p>)}</div>
+              {s.about_quote && <blockquote className="mt-5 border-l-4 border-clay pl-4 font-serif text-lg italic text-neutral-800">{s.about_quote}</blockquote>}
+              {s.about_name && <p className="mt-3 text-sm font-medium">{s.about_name}</p>}
+              <div className="mt-5 flex flex-wrap gap-2">{[s.about_p1, s.about_p2, s.about_p3].filter(Boolean).map((t) => <span key={t} className="rounded-full bg-white/80 px-3 py-1.5 text-xs font-medium">♡ {t}</span>)}</div>
+              {s.about_cta && <Link href={s.about_link || "/shop"} className="btn mt-6 inline-flex">{s.about_cta} <ArrowRight size={16} /></Link>}
+            </div>
+          </div>
+        </section></Reveal>
+      )}
+
       <TabbedRail tone="bg-butter/50" eyebrow={s.new_eyebrow} title={s.new_title} tabs={[{ label: "New arrivals", products: all_ }, { label: "Bestsellers", products: featured.length ? featured : all_ }]} />
       {on("sale_enabled") && <Rail tone="bg-blush/60" eyebrow={s.sale_eyebrow} title={s.sale_title} href="/sale" products={sale} />}
       <ReelsSection home eyebrow="Instagram" tone="bg-lilac/50" />
