@@ -5,12 +5,12 @@ import { slugify } from "./util";
 const ph = (t: string, h: number) => `/api/ph?t=${encodeURIComponent(t)}&h=${h}`;
 
 const CATS = [
-  ["Jar Candles", "Hand-poured soy wax candles in glass and ceramic jars", 335],
-  ["Pillar Candles", "Smooth, long-burning pillars for tables and altars", 25],
-  ["Jesmonite Candles", "Designer candles poured in handmade jesmonite and cement vessels", 165],
-  ["Tealights & Floating", "Scented tealights, floating roses and festive diya candles", 45],
-  ["Gift Sets", "Curated candle sets, ready to gift", 285],
-  ["Raw Materials", "Jesmonite, epoxy resin, white cement and pigments for makers", 205],
+  ["Jar Candles", "Soy wax candles in glass jars — for slow evenings and quiet corners", 335],
+  ["Pillar Candles", "Pillars for dinner tables, festive altars and golden-hour moments", 25],
+  ["Jesmonite Candles", "Candles in handmade stone-look vessels you will keep long after the wax is gone", 165],
+  ["Tealights & Floating", "Little lights for festivals, dinners and the evenings that become memories", 45],
+  ["Gift Sets", "Thoughtful sets, ready to gift — so you can say it softly", 285],
+  ["Raw Materials", "Jesmonite, resin, white cement and pigments — for makers who want to create their own", 205],
 ];
 
 // [name, category, type, price, saleOrNull, stock, tags, spec, badge, featured, variants?, comboItems?, hsn?]
@@ -72,8 +72,14 @@ export async function seed(c: Client) {
   const img0: Record<string, string> = {};
   const skuOf: Record<string, string> = {};
   const vid: Record<string, number> = {};
-  const lorem =
-    "This is placeholder product copy. Replace it from Admin → Products with your real description, fragrance notes, burn time, care instructions and safety information.\n\nSupports multiple paragraphs.";
+  const story: Record<string, (n: string, spec: string) => string> = {
+    "Jar Candles": (n, spec) => `${n} is made for the evenings you finally get to slow down. Poured by hand in a small batch with clean-burning soy wax and a cotton wick, it fills your space with a scent that feels like a hug from someone you love.\n\n${spec}\n\n**Lovely for:** your reading corner, a long bath, or a gift that says "I was thinking of you".\n\n**Care:** trim the wick to 5 mm, let the first burn melt to the edges, and never leave a flame unattended.`,
+    "Pillar Candles": (n, spec) => `${n} is for the tables where stories get told. Hand-poured and finished with care, it turns dinners, festivals and quiet rituals into moments worth remembering.\n\n${spec}\n\n**Lovely for:** festive tables, altars, and golden-hour corners.\n\n**Care:** trim the wick before each burn and keep on a heat-safe holder.`,
+    "Jesmonite Candles": (n, spec) => `${n} begins as a hand-poured vessel and ends as something you keep. Shaped by hand and finished with a stone-like texture, no two pieces are exactly alike — and that is the beauty of it.\n\n${spec}\n\n**Lovely for:** shelves, desks and gifts for people with good taste. When the candle is done, let it live on as a planter or trinket holder.\n\n**Care:** wipe with a dry cloth; keep away from water.`,
+    "Tealights & Floating": (n, spec) => `${n} brings a little glow to the occasions you want to hold on to — festivals, dinners, a quiet night in.\n\n${spec}\n\n**Lovely for:** festive décor, bowls of water and petals, and tables full of people you love.\n\n**Care:** use on a heat-safe surface and never leave unattended.`,
+    "Gift Sets": (n, spec) => `${n} is the gift that says what words sometimes can't. Chosen to go together and packed by hand, it arrives ready to make someone's day a little softer.\n\n${spec}\n\n**Lovely for:** birthdays, housewarmings, festivals, and "just because".`,
+    "Raw Materials": (n, spec) => `${n} is for makers — the ones who want to pour, shape and create something that is truly their own. We use these materials in our own studio, and we are happy to share what we have learned.\n\n${spec}\n\n**New to this?** Message us on WhatsApp and we will help you choose what to start with.\n\n**Safety:** follow the instructions on the pack and work in a ventilated space.`,
+  };
   for (const row of P) {
     const [name, cat, type, price, sale, stock, tags, spec, badge, featured, variants, comboItems, hsn] = row;
     const hue = [...name].reduce((a: number, ch: string) => a + ch.charCodeAt(0), 0) % 360;
@@ -85,7 +91,7 @@ export async function seed(c: Client) {
     const r = await c.execute({
       sql: `insert into products (type,name,slug,short_desc,spec_line,description,category_id,tags,images,price,sale_price,sale_start,sale_end,sku,stock,low_stock,track_stock,status,featured,badge,weight_g,hsn)
             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'published',?,?,?,?)`,
-      args: [type, name, slugify(name), spec, spec, lorem, catId[cat], tags, imgs, minV, sale, saleDate[0], saleDate[1],
+      args: [type, name, slugify(name), spec, spec, story[cat](name, spec), catId[cat], tags, imgs, minV, sale, saleDate[0], saleDate[1],
         "SKU-" + slugify(name).slice(0, 8).toUpperCase(), stock, 5, type === "digital" || type === "combo" ? 0 : 1, featured, badge, 500, hsn || ""],
     });
     pid[name] = Number(r.lastInsertRowid);
@@ -199,15 +205,17 @@ export async function seed(c: Client) {
   await c.execute("insert into bulk_rules (name,scope,basis,min_qty,max_qty,discount_type,value) values ('Wholesale','all','qty',10,0,'percent',10)");
   // sample FAQs + blog posts
   const faqs: [string, string][] = [
-    ["How long does delivery take?", "Orders ship in 2–3 business days and usually arrive in 3–7 days across India."],
-    ["Do you offer cash on delivery?", "Yes, COD is available on physical products. You can also pay by UPI."],
-    ["Can I return a product?", "Unused items can be returned within 7 days of delivery. Candles that have been lit cannot be returned."],
-    ["What wax do you use and how long do candles burn?", "Our jar candles use clean-burning soy wax with cotton wicks and burn for roughly 40–60 hours depending on size."],
-    ["Do you sell jesmonite, resin and white cement?", "Yes. Our Raw Materials category stocks jesmonite kits, epoxy resin, white cement and pigments for makers."],
-    ["Do you do bulk or corporate gifting orders?", "Yes — message us on WhatsApp with what you need and we'll share a quote."],
+    ["Is Jasmonoide a new brand?", "Yes — we are a brand-new studio, and every order truly means the world to us. Each one is packed by hand and checked by us personally."],
+    ["How long does delivery take?", "We pack your order in 2–3 business days, and it usually reaches you in 3–7 days across India. We'll keep you posted along the way."],
+    ["Do you offer cash on delivery?", "Yes, COD is available on physical products. You can also pay by UPI, whichever feels easiest."],
+    ["Can I return a product?", "If something isn't right, tell us within 7 days of delivery and we'll make it right. For safety, candles that have been lit cannot be returned."],
+    ["What are your candles made of?", "Our jar candles are hand-poured in small batches with clean-burning soy wax and cotton wicks. Burn time depends on size — see each product page."],
+    ["I'm new to candle or jesmonite making — can you help?", "Of course. Our Raw Materials range is chosen for makers, and we're happy to guide you on WhatsApp. Everyone starts somewhere."],
+    ["Can I send a candle as a gift with a message?", "Absolutely. Add a note in the order comments and we'll tuck a handwritten card into the parcel. For bulk or corporate gifting, message us on WhatsApp."],
   ];
   for (let i = 0; i < faqs.length; i++) await c.execute({ sql: "insert into faqs (question,answer,sort) values (?,?,?)", args: [faqs[i][0], faqs[i][1], i] });
   const posts: [string, string, string][] = [
+    ["Hello from our little studio", "Why we started, and why you're part of our first chapter.", "## Every brand starts with a small flame\n\nJasmonoide began with a simple wish: to make things that help people slow down. A candle is a small thing — but a lit candle at the end of a long day can feel like the world finally exhaling.\n\n## Made by hand, in small batches\n\nWe pour in small batches because we'd rather make fewer things with more care. Every candle is checked, every parcel is packed by hand.\n\n## You're part of chapter one\n\nWe are just getting started, and you being here means more than we can say. Tell us what you'd love to see next — we read every message.\n\nWith love,\nThe Jasmonoide studio\n\nBrowse the [new arrivals](/shop) or say hello on WhatsApp."],
     ["How to care for your candle for a longer, cleaner burn", "Trim, burn and store your candle the right way.", "## Before the first burn\n\nLet the first burn run until the wax melts all the way to the edge. This stops tunnelling.\n\n## Every time\n\n1. Trim the wick to about 5 mm.\n2. Burn for 2–3 hours at a time.\n3. Keep away from drafts and flammable items.\n4. Never leave a burning candle unattended.\n\nBrowse our [jar candles](/shop) to find your scent."],
     ["Jesmonite vs resin vs white cement for candle vessels", "A quick guide to the three materials we stock.", "## The short answer\n\n**Jesmonite** is water-based, low-odour and gives a stone-like finish. **Epoxy resin** is glossy and translucent. **White cement** is the budget-friendly choice for minimal concrete-look vessels.\n\n## Which one for you?\n\n- Premium matte vessels: Jesmonite\n- Glassy, colourful pieces: Epoxy resin\n- Minimal, sturdy vessels: White cement\n\nAsk our assistant or message us on WhatsApp if you are unsure."],
     ["5 ways to style candles at home", "Simple ideas for tables, shelves and festive corners.", "## Styling ideas\n\n1. Group candles in odd numbers.\n2. Mix heights with pillars and jars.\n3. Use a tray to anchor the display.\n4. Match scent strength to the room size.\n5. Add floating candles for dinners."],

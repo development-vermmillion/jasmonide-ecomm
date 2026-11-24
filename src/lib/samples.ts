@@ -27,9 +27,12 @@ function pick(label: string): string[] {
   return POOLS.mood;
 }
 
-export function samplePhoto(label: string, w = 900): string {
+export function samplePick(label: string): string {
   const pool = pick(label || "");
   const h = [...(label || "x")].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
-  const id = pool[h % pool.length];
-  return `https://unsplash.com/photos/${id}/download?force=true&w=${w}&q=75`;
+  return pool[h % pool.length];
+}
+
+export function samplePhoto(label: string, w = 900): string {
+  return `https://unsplash.com/photos/${samplePick(label)}/download?force=true&w=${w}&q=75`;
 }

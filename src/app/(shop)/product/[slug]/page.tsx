@@ -10,6 +10,7 @@ import Reviews from "@/components/Reviews";
 import ReelsSection from "@/components/ReelsSection";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import { inr } from "@/lib/util";
+import { Markdown } from "@/lib/md";
 import { activeRules } from "@/lib/bulk";
 import { ruleLabel } from "@/lib/bulk-label";
 
@@ -80,7 +81,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         <Reveal>
           <section className="max-w-3xl py-8">
             <p className="eyebrow">Description</p>
-            <div className="mt-3 space-y-3 whitespace-pre-line text-[15px] leading-relaxed text-neutral-700">{p.description || p.short_desc}</div>
+            <div className="mt-3 text-[15px]"><Markdown text={p.description || p.short_desc} /></div>
             {p.tags && <div className="mt-4 flex flex-wrap gap-2">{p.tags.split(",").filter(Boolean).map((t: string) => <Link key={t} href={`/shop?q=${t.trim()}`} className="rounded-full bg-lilac px-3 py-1 text-xs">#{t.trim()}</Link>)}</div>}
           </section>
         </Reveal>

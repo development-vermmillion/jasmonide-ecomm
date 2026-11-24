@@ -32,8 +32,8 @@ export default async function OrderPage({ params, searchParams }: { params: { nu
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <span className="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-mint text-green-700"><CheckCircle2 size={30} /></span>
       <p className="eyebrow">Thank you, {o.name?.split(" ")[0]}</p>
-      <h1 className="h-serif mt-1 text-3xl sm:text-4xl">Order {o.number} placed</h1>
-      <p className="mt-2 text-neutral-600">We've received your order on {fdatetime(o.created_at)}. Status: <b className="capitalize">{o.status}</b>.</p>
+      <h1 className="h-serif mt-1 text-3xl sm:text-4xl">Your order is on its way to becoming a memory</h1>
+      <p className="mt-3 text-neutral-600">Order <b>{o.number}</b> reached us on {fdatetime(o.created_at)}. As a new studio, every order means the world to us — we'll pack yours by hand, with love. Status: <b className="capitalize">{o.status}</b>.</p>
 
       {o.payment_status === "paid" && <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-mint px-3 py-1 text-sm font-medium text-green-800"><CheckCircle2 size={15} /> Payment received{o.payment_ref ? ` · Ref ${o.payment_ref}` : ""}</p>}
       {o.payment_status !== "paid" && o.status !== "cancelled" && (o.payment_method === "upi" || (o.payment_method === "online" && online)) && (

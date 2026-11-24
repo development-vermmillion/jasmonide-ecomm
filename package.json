@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "samples": "node scripts/fetch-samples.mjs",
     "db:reset": "node -e \"require('fs').rmSync('data',{recursive:true,force:true});console.log('Database removed. It will be re-created with sample data on next start.')\""
   },
   "dependencies": {

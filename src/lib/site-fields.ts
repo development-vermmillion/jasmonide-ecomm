@@ -5,8 +5,8 @@ export type FieldGroup = { title: string; note?: string; fields: Field[] };
 export const BRAND_SEO: FieldGroup[] = [
   { title: "Brand identity", note: "Used in the header, footer, browser tab, emails and share previews.", fields: [
     { key: "store_name", label: "Brand name", def: "Jasmonoide" },
-    { key: "tagline", label: "Tagline (short)", def: "Premium candles & casting materials" },
-    { key: "site_description", label: "Brand description (about 150 characters)", def: "Premium hand-poured candles, plus jesmonite, resin and white cement for makers. Shipped across India.", type: "area", help: "Shown in Google results and when your link is shared." },
+    { key: "tagline", label: "Tagline (short)", def: "Candles that feel like coming home" },
+    { key: "site_description", label: "Brand description (about 150 characters)", def: "Small-batch, hand-poured candles and jesmonite décor — made to turn ordinary evenings into memories. Packed with love and shipped across India.", type: "area", help: "Shown in Google results and when your link is shared." },
     { key: "logo_url", label: "Logo", def: "", type: "image", help: "Leave empty to show the brand name as text." },
     { key: "favicon_url", label: "Favicon (browser-tab icon, square PNG)", def: "", type: "image" },
     { key: "og_image", label: "Share image (1200×630) for WhatsApp/Instagram/Google", def: "", type: "image" },
@@ -14,8 +14,8 @@ export const BRAND_SEO: FieldGroup[] = [
   ] },
   { title: "Search engine (SEO)", fields: [
     { key: "site_url", label: "Website address (no trailing slash)", def: "https://www.yourdomain.com", type: "url", help: "Needed for the sitemap, canonical links and schema." },
-    { key: "seo_home_title", label: "Home page title (50–60 chars)", def: "Jasmonoide — Premium candles & casting materials in India" },
-    { key: "seo_home_desc", label: "Home page meta description (140–160 chars)", def: "Shop premium scented candles, designer jesmonite candles and gift sets. Also jesmonite, epoxy resin and white cement. Free shipping above ₹999.", type: "area" },
+    { key: "seo_home_title", label: "Home page title (50–60 chars)", def: "Jasmonoide — Hand-poured candles that feel like home" },
+    { key: "seo_home_desc", label: "Home page meta description (140–160 chars)", def: "Small-batch scented candles, handmade jesmonite vessels and gifts from the heart. Also jesmonite, resin and white cement for makers. Free shipping above ₹999.", type: "area" },
     { key: "seo_title_suffix", label: "Title ending on other pages", def: " · Jasmonoide" },
     { key: "seo_keywords", label: "Keywords (comma separated, optional)", def: "premium candles, scented candles, jesmonite candles, soy candles, gift sets, jesmonite, epoxy resin, white cement" },
     { key: "seo_noindex", label: "Hide whole site from Google (use while testing)", def: "0", type: "toggle" },
@@ -28,7 +28,7 @@ export const BRAND_SEO: FieldGroup[] = [
   ] },
   { title: "AI search (GEO) — ChatGPT, Gemini, Perplexity, Claude", note: "Helps AI assistants find, understand and cite your store.", fields: [
     { key: "ai_crawlers_allowed", label: "Allow AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended…)", def: "1", type: "toggle" },
-    { key: "llms_about", label: "About us for AI (plain facts: who, what, where, how long, what makes you different)", def: "We hand-pour premium candles and also supply jesmonite, epoxy resin and white cement to makers across India.", type: "area" },
+    { key: "llms_about", label: "About us for AI (plain facts: who, what, where, how long, what makes you different)", def: "Jasmonoide is a new small-batch candle studio in India. We hand-pour scented soy candles and jesmonite vessel candles, curate gift sets, and supply jesmonite, epoxy resin and white cement to makers.", type: "area" },
     { key: "llms_facts", label: "Key facts for AI (one per line: shipping, returns, payment, specialities)", def: "Ships across India\nCash on delivery available\n7-day returns on unused items", type: "area" },
   ] },
 ];
@@ -37,52 +37,52 @@ export const ASSISTANT: FieldGroup[] = [
   { title: "AI shopping assistant", note: "Runs on your own server — free, no API. Teach it in Admin → Assistant (chats & taught answers), FAQs, and the box below.", fields: [
     { key: "assistant_log_chats", label: "Save visitor questions so I can review and teach the assistant", def: "1", type: "toggle" },
     { key: "assistant_name", label: "Assistant name", def: "Maya" },
-    { key: "assistant_greeting", label: "Greeting", def: "Hi! I'm Maya. Ask me about candles, scents, materials, shipping or returns.", type: "area" },
+    { key: "assistant_greeting", label: "Greeting", def: "Hi, I'm Maya. Tell me who you're shopping for or what mood you want to create, and I'll help you find the perfect candle — or the right materials for your own making.", type: "area" },
     { key: "assistant_extra", label: "Extra knowledge (one fact per line, e.g. “Our soy candles burn for 40–50 hours”)", def: "", type: "area" },
   ] },
 ];
 
 export const HOME: FieldGroup[] = [
   { title: "Hero banner", fields: [
-    { key: "hero_eyebrow", label: "Small label above headline", def: "Premium · Hand-poured" },
-    { key: "hero_title", label: "Headline", def: "Light up every moment" },
-    { key: "hero_text", label: "Sub-text", def: "Hand-poured premium candles for every mood — and jesmonite, resin and white cement for your own creations.", type: "area" },
-    { key: "hero_cta", label: "Button text", def: "Shop all" },
+    { key: "hero_eyebrow", label: "Small label above headline", def: "Small-batch · Hand-poured · Made with love" },
+    { key: "hero_title", label: "Headline", def: "Light a little warmth into every evening" },
+    { key: "hero_text", label: "Sub-text", def: "Candles poured by hand, one small batch at a time — for slow evenings, shared laughter and the people who feel like home.", type: "area" },
+    { key: "hero_cta", label: "Button text", def: "Find your glow" },
     { key: "hero_link", label: "Button link", def: "/shop" },
     { key: "hero_image", label: "Hero image", def: "", type: "image" },
   ] },
   { title: "Side promo tiles", fields: [
-    { key: "promo1_title", label: "Tile 1 title", def: "Gift sets" }, { key: "promo1_text", label: "Tile 1 text", def: "Curated candle hampers" }, { key: "promo1_link", label: "Tile 1 link", def: "/combos" }, { key: "promo1_image", label: "Tile 1 image", def: "", type: "image" },
-    { key: "promo2_title", label: "Tile 2 title", def: "Sale" }, { key: "promo2_text", label: "Tile 2 text", def: "Limited-time offers" }, { key: "promo2_link", label: "Tile 2 link", def: "/sale" }, { key: "promo2_image", label: "Tile 2 image", def: "", type: "image" },
+    { key: "promo1_title", label: "Tile 1 title", def: "Gifts from the heart" }, { key: "promo1_text", label: "Tile 1 text", def: "Hampers that say what words can't" }, { key: "promo1_link", label: "Tile 1 link", def: "/combos" }, { key: "promo1_image", label: "Tile 1 image", def: "", type: "image" },
+    { key: "promo2_title", label: "Tile 2 title", def: "Gentle savings" }, { key: "promo2_text", label: "Tile 2 text", def: "A little extra love, while it lasts" }, { key: "promo2_link", label: "Tile 2 link", def: "/sale" }, { key: "promo2_image", label: "Tile 2 image", def: "", type: "image" },
   ] },
   { title: "Trust strip (4 boxes)", fields: [
     { key: "show_usp", label: "Show this strip", def: "1", type: "toggle" },
-    { key: "usp1_title", label: "Box 1 title", def: "Free shipping" }, { key: "usp1_text", label: "Box 1 text", def: "On orders above ₹999" },
-    { key: "usp2_title", label: "Box 2 title", def: "Premium quality" }, { key: "usp2_text", label: "Box 2 text", def: "Clean-burning soy wax" },
-    { key: "usp3_title", label: "Box 3 title", def: "Cash on delivery" }, { key: "usp3_text", label: "Box 3 text", def: "Or pay by UPI" },
-    { key: "usp4_title", label: "Box 4 title", def: "Gifting help" }, { key: "usp4_text", label: "Box 4 text", def: "Ask us on WhatsApp" },
+    { key: "usp1_title", label: "Box 1 title", def: "Free shipping" }, { key: "usp1_text", label: "Box 1 text", def: "Above ₹999 · wrapped with care" },
+    { key: "usp2_title", label: "Box 2 title", def: "Made by hand" }, { key: "usp2_text", label: "Box 2 text", def: "Small batches · clean soy wax" },
+    { key: "usp3_title", label: "Box 3 title", def: "Pay your way" }, { key: "usp3_text", label: "Box 3 text", def: "Cash on delivery or UPI" },
+    { key: "usp4_title", label: "Box 4 title", def: "A real person" }, { key: "usp4_text", label: "Box 4 text", def: "Say hello on WhatsApp" },
   ] },
   { title: "Section headings", fields: [
-    { key: "cat_eyebrow", label: "Categories — label", def: "Shop by category" }, { key: "cat_title", label: "Categories — heading", def: "Candles & materials" }, { key: "show_categories", label: "Show categories", def: "1", type: "toggle" },
-    { key: "new_eyebrow", label: "New arrivals — label", def: "Just in" }, { key: "new_title", label: "New arrivals — heading", def: "Fresh from the studio" },
-    { key: "sale_eyebrow", label: "Sale rail — label", def: "Limited time" }, { key: "sale_title", label: "Sale rail — heading", def: "On sale" },
-    { key: "combo_eyebrow", label: "Combos rail — label", def: "Save more" }, { key: "combo_title", label: "Combos rail — heading", def: "Gift sets & combos" },
+    { key: "cat_eyebrow", label: "Categories — label", def: "Find your mood" }, { key: "cat_title", label: "Categories — heading", def: "A candle for every moment" }, { key: "show_categories", label: "Show categories", def: "1", type: "toggle" },
+    { key: "new_eyebrow", label: "New arrivals — label", def: "Just poured" }, { key: "new_title", label: "New arrivals — heading", def: "Fresh from our studio" },
+    { key: "sale_eyebrow", label: "Sale rail — label", def: "While they last" }, { key: "sale_title", label: "Sale rail — heading", def: "Gentle savings" },
+    { key: "combo_eyebrow", label: "Combos rail — label", def: "Made for gifting" }, { key: "combo_title", label: "Combos rail — heading", def: "Gifts that feel like a hug" },
     { key: "learn_eyebrow", label: "Courses rail — label", def: "Learn" }, { key: "learn_title", label: "Courses rail — heading", def: "E-courses & guides" }, { key: "show_learn", label: "Show courses rail", def: "0", type: "toggle" },
   ] },
   { title: "Inspiration / projects", fields: [
     { key: "show_projects", label: "Show this section", def: "1", type: "toggle" },
-    { key: "proj_eyebrow", label: "Label", def: "Community" }, { key: "proj_title", label: "Heading", def: "Ideas to inspire you" },
-    { key: "proj1_title", label: "Project 1 title", def: "Candle styling for festive tables" }, { key: "proj1_image", label: "Project 1 image", def: "", type: "image" }, { key: "proj1_link", label: "Project 1 link (blog post etc.)", def: "/blog" },
-    { key: "proj2_title", label: "Project 2 title", def: "Cosy bedroom candle corner" }, { key: "proj2_image", label: "Project 2 image", def: "", type: "image" }, { key: "proj2_link", label: "Project 2 link", def: "/blog" },
-    { key: "proj3_title", label: "Project 3 title", def: "Pouring a jesmonite candle vessel" }, { key: "proj3_image", label: "Project 3 image", def: "", type: "image" }, { key: "proj3_link", label: "Project 3 link", def: "/blog" },
+    { key: "proj_eyebrow", label: "Label", def: "Inspiration" }, { key: "proj_title", label: "Heading", def: "Make your home glow" },
+    { key: "proj1_title", label: "Project 1 title", def: "Setting the table for a festive evening" }, { key: "proj1_image", label: "Project 1 image", def: "", type: "image" }, { key: "proj1_link", label: "Project 1 link (blog post etc.)", def: "/blog" },
+    { key: "proj2_title", label: "Project 2 title", def: "A cosy corner just for you" }, { key: "proj2_image", label: "Project 2 image", def: "", type: "image" }, { key: "proj2_link", label: "Project 2 link", def: "/blog" },
+    { key: "proj3_title", label: "Project 3 title", def: "Pour your very first jesmonite vessel" }, { key: "proj3_image", label: "Project 3 image", def: "", type: "image" }, { key: "proj3_link", label: "Project 3 link", def: "/blog" },
   ] },
   { title: "Brand story", fields: [
     { key: "show_story", label: "Show this section", def: "1", type: "toggle" },
-    { key: "story_title", label: "Heading", def: "Poured by hand, made to be gifted" },
-    { key: "story_text", label: "Text", def: "Tell customers who you are, how your candles are made and why they should trust your materials.", type: "area" },
-    { key: "stat1_n", label: "Stat 1 number", def: "10+" }, { key: "stat1_l", label: "Stat 1 label", def: "years" },
-    { key: "stat2_n", label: "Stat 2 number", def: "50k+" }, { key: "stat2_l", label: "Stat 2 label", def: "happy customers" },
-    { key: "stat3_n", label: "Stat 3 number", def: "28" }, { key: "stat3_l", label: "Stat 3 label", def: "states shipped" },
+    { key: "story_title", label: "Heading", def: "Made slowly, for the moments that matter" },
+    { key: "story_text", label: "Text", def: "Jasmonoide is a brand-new studio built on a simple belief: the smallest rituals — a lit candle, a quiet evening, a gift chosen with care — are the ones we remember. Every piece is poured by hand in small batches, because we would rather make fewer things with more love. You are not just buying a candle; you are becoming part of our very first chapter, and we are so grateful you are here.", type: "area" },
+    { key: "stat1_n", label: "Stat 1 number", def: "100%" }, { key: "stat1_l", label: "Stat 1 label", def: "hand-poured" },
+    { key: "stat2_n", label: "Stat 2 number", def: "40+ hrs" }, { key: "stat2_l", label: "Stat 2 label", def: "of slow, clean burn*" },
+    { key: "stat3_n", label: "Stat 3 number", def: "7 days" }, { key: "stat3_l", label: "Stat 3 label", def: "easy returns" },
   ] },
   { title: "Blog teaser & press", fields: [
     { key: "show_blog_home", label: "Show latest blog posts on home", def: "1", type: "toggle" },
@@ -90,10 +90,10 @@ export const HOME: FieldGroup[] = [
     { key: "press_names", label: "Press names (comma separated)", def: "PressLogo, DailyCraft, MakerWeekly" },
   ] },
   { title: "Top bar & footer", fields: [
-    { key: "announcement", label: "Announcement bar text", def: "Free shipping above ₹999 · Bulk order enquiries on WhatsApp" },
-    { key: "footer_about", label: "Footer about text", def: "Premium candles & casting materials.", type: "area" },
-    { key: "newsletter_title", label: "Newsletter heading", def: "Join our candle club" },
-    { key: "newsletter_text", label: "Newsletter text", def: "New scents, offers and care tips — no spam." },
+    { key: "announcement", label: "Announcement bar text", def: "Free shipping above ₹999 · Every order is packed by hand, with love" },
+    { key: "footer_about", label: "Footer about text", def: "Hand-poured candles and handmade décor, made in small batches to turn ordinary evenings into memories. Thank you for being part of our first chapter.", type: "area" },
+    { key: "newsletter_title", label: "Newsletter heading", def: "Join our candle circle" },
+    { key: "newsletter_text", label: "Newsletter text", def: "Be the first to hear about new scents and little stories from the studio. No spam — only warmth." },
   ] },
 ];
 

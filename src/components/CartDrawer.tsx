@@ -28,8 +28,8 @@ export function CartDrawer({ freeMin }: { freeMin: number }) {
         </div>
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-            <ShoppingBag size={44} className="text-neutral-300" /><p className="text-neutral-500">Your bag is empty.</p>
-            <Link href="/shop" onClick={() => setOpen(false)} className="btn">Start shopping</Link>
+            <ShoppingBag size={44} className="text-neutral-300" /><div><p className="h-serif text-xl">Your bag is waiting</p><p className="mt-1 text-sm text-neutral-500">Something warm and lovely is out there for you.</p></div>
+            <Link href="/shop" onClick={() => setOpen(false)} className="btn">Find your glow</Link>
           </div>
         ) : (
           <>

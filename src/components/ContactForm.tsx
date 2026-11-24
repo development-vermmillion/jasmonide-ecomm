@@ -8,7 +8,7 @@ export default function ContactForm() {
   async function go(e: React.FormEvent) {
     e.preventDefault();
     const r = await (await fetch("/api/contact", { method: "POST", body: JSON.stringify(f) })).json();
-    setMsg({ ok: r.ok, t: r.ok ? "Thanks! We'll get back to you soon." : r.error });
+    setMsg({ ok: r.ok, t: r.ok ? "Thank you for reaching out — a real person will write back to you soon." : r.error });
     if (r.ok) setF({ name: "", email: "", phone: "", message: "" });
   }
   const set = (k: string) => (e: any) => setF({ ...f, [k]: e.target.value });

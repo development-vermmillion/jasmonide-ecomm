@@ -12,7 +12,7 @@ export default function CartPage() {
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <h1 className="h-serif text-3xl">Your bag</h1>
       {!ready ? null : items.length === 0 ? (
-        <div className="py-20 text-center"><ShoppingBag size={48} className="mx-auto mb-3 text-neutral-300" /><p className="text-neutral-500">Your bag is empty.</p><Link href="/shop" className="btn mt-4">Continue shopping</Link></div>
+        <div className="py-20 text-center"><ShoppingBag size={48} className="mx-auto mb-3 text-neutral-300" /><p className="h-serif text-2xl">Your bag is waiting</p><p className="mt-1 text-neutral-500">Something warm and lovely is out there for you.</p><Link href="/shop" className="btn mt-5">Find your glow</Link></div>
       ) : (
         <>
           <ul className="mt-6 divide-y divide-neutral-200 border-y border-neutral-200">

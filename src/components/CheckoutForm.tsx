@@ -52,7 +52,7 @@ export default function CheckoutForm({ cfg }: { cfg: { shipping: number; freeMin
   if (cfg.loginRequired)
     return <div className="py-24 text-center"><p className="text-neutral-600">Please sign in to place an order.</p><Link href="/account/login?next=/checkout" className="btn mt-4">Sign in / Create account</Link></div>;
   if (!items.length)
-    return <div className="py-24 text-center"><p className="text-neutral-500">Your bag is empty.</p><Link href="/shop" className="btn mt-4">Continue shopping</Link></div>;
+    return <div className="py-24 text-center"><p className="h-serif text-2xl">Your bag is waiting</p><p className="mt-1 text-neutral-500">Something warm and lovely is out there for you.</p><Link href="/shop" className="btn mt-5">Find your glow</Link></div>;
 
   return (
     <form onSubmit={place} className="mx-auto grid max-w-6xl gap-10 px-4 py-10 sm:px-6 lg:grid-cols-5">

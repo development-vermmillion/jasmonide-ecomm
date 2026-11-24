@@ -12,7 +12,7 @@ export default function ReviewForm({ productId, defaultName }: { productId: numb
   async function go(e: React.FormEvent) {
     e.preventDefault();
     const r = await (await fetch("/api/reviews", { method: "POST", body: JSON.stringify({ ...f, rating, product_id: productId }) })).json();
-    setMsg({ ok: r.ok, t: r.ok ? (r.status === "approved" ? "Thank you! Your review is live." : "Thank you! Your review will appear once approved.") : r.error });
+    setMsg({ ok: r.ok, t: r.ok ? (r.status === "approved" ? "Thank you — your words mean so much to a small studio like ours. Your review is live." : "Thank you! Your review will appear once approved.") : r.error });
     if (r.ok) { setF({ ...f, title: "", body: "" }); setRating(0); router.refresh(); }
   }
   return (
