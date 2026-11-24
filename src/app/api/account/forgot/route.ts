@@ -9,6 +9,7 @@ import { sendEmail, emailShell } from "@/lib/notify";
 /** Always answers the same way, so nobody can use this to discover which emails have accounts. */
 export async function POST(req: Request) {
   const { email } = await req.json().catch(() => ({}));
+  if ((await getSettings()).forgot_enabled === "0") return NextResponse.json({ ok: false, error: "Password reset is switched off. Please contact us." }, { status: 403 });
   const e = String(email || "").trim().toLowerCase();
   if (!/^\S+@\S+\.\S+$/.test(e)) return NextResponse.json({ ok: false, error: "Enter your email address" }, { status: 400 });
   if (!(await allow("forgot:ip:" + clientIp(req), 8, 3600)) || !(await allow("forgot:" + e, 3, 3600))) return NextResponse.json(TOO_MANY, { status: 429 });

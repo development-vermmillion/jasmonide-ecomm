@@ -1,4 +1,5 @@
 import { one, run } from "./db";
+import { getSettings } from "./catalog";
 
 /** Client IP behind proxies (Hostinger / cPanel / Cloudflare). */
 export function clientIp(req: Request) {
@@ -8,6 +9,7 @@ export function clientIp(req: Request) {
 
 /** Simple database-backed limiter: at most `max` hits per `windowSec` for `key`. Returns true when the action is allowed. */
 export async function allow(key: string, max: number, windowSec: number): Promise<boolean> {
+  if ((await getSettings()).rate_limit_enabled === "0") return true;
   const now = Date.now(), from = now - windowSec * 1000;
   const r = await one("select count(*) n from rate_hits where key = ? and ts > ?", [key, from]);
   if ((r?.n || 0) >= max) return false;

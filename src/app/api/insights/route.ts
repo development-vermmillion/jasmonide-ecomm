@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { all, batch, one, run } from "@/lib/db";
 import { allow, clientIp } from "@/lib/ratelimit";
+import { getSettings } from "@/lib/catalog";
 
 const TYPES = new Set(["view", "product", "click", "scroll", "time", "atc", "wish", "unwish", "search", "checkout", "pclick", "cclick", "pincode", "quiz", "box"]);
 const BOT = /bot|crawl|spider|slurp|preview|facebookexternalhit|headless|lighthouse/i;
@@ -10,6 +11,7 @@ const num = (v: any) => (Number.isFinite(Number(v)) ? Number(v) : null);
 
 export async function POST(req: Request) {
   try {
+    if ((await getSettings()).insights_enabled === "0") return NextResponse.json({ ok: true });
     if (BOT.test(req.headers.get("user-agent") || "") || cookies().get("admin_session")?.value) return NextResponse.json({ ok: true });
     if (!(await allow("ins:" + clientIp(req), 600, 3600))) return NextResponse.json({ ok: true });
     const b = await req.json();

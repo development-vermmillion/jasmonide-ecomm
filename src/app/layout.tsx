@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     applicationName: s.store_name,
     alternates: { canonical: "/" },
     icons: s.favicon_url ? { icon: s.favicon_url, apple: s.favicon_url } : { apple: "/icons/apple-touch.png" },
-    manifest: "/manifest.webmanifest",
+    manifest: s.pwa_enabled === "0" ? undefined : "/manifest.webmanifest",
     openGraph: { type: "website", siteName: s.store_name, title, description: desc, images: s.og_image ? [s.og_image] : undefined, locale: "en_IN" },
     twitter: { card: "summary_large_image", title, description: desc, images: s.og_image ? [s.og_image] : undefined },
     robots: s.seo_noindex === "1" ? { index: false, follow: false } : { index: true, follow: true },

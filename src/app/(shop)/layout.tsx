@@ -38,8 +38,8 @@ export default async function ShopLayout({ children }: { children: React.ReactNo
         <CartDrawer freeMin={Number(s.free_shipping_min)} />
         <ScrollExtras />
         <Tracker />
-        <Insights />
-        <PwaRegister />
+        {s.insights_enabled === "1" && <Insights />}
+        <PwaRegister enabled={s.pwa_enabled === "1"} />
         {s.cookie_banner_enabled === "1" && <CookieBanner text={s.cookie_banner_text} />}
         {s.assistant_enabled === "1" && <AssistantWidget name={s.assistant_name} greeting={s.assistant_greeting} />}
         {s.whatsapp_button === "1" && (
