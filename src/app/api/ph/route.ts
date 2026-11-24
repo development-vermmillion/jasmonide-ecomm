@@ -1,6 +1,12 @@
-// Generates a soft placeholder image (SVG) so the demo works without any real photos.
+import { samplePhoto } from "@/lib/samples";
+
+// Placeholder images: redirects to a free sample photo. Add &svg=1 for the drawn fallback.
 export async function GET(req: Request) {
   const u = new URL(req.url);
+  if (u.searchParams.get("svg") !== "1") {
+    const w = Math.min(1600, Math.max(200, Number(u.searchParams.get("w") || 900)));
+    return new Response(null, { status: 302, headers: { Location: samplePhoto(u.searchParams.get("t") || "", w), "Cache-Control": "public, max-age=3600" } });
+  }
   const t = (u.searchParams.get("t") || "").slice(0, 40);
   const h = Number(u.searchParams.get("h") || 30) % 360;
   const esc = (s: string) => s.replace(/[<>&"]/g, "");

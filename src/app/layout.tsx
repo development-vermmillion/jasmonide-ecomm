@@ -41,6 +41,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: "try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}" }} />
+        <script dangerouslySetInnerHTML={{ __html: "document.addEventListener('error',function(e){var t=e.target;if(t&&t.tagName==='IMG'){var s=t.getAttribute('src')||'';if(s.indexOf('/api/ph')===0&&s.indexOf('svg=1')<0)t.setAttribute('src',s+'&svg=1')}},true)" }} />
         <noscript><style>{".reveal{opacity:1;transform:none}"}</style></noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }} />
         {s.ga_id && <>

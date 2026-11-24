@@ -1,76 +1,74 @@
 import Link from "next/link";
 import { all } from "@/lib/db";
-import { getSettings, getCategories, placeholder } from "@/lib/catalog";
+import { getSettings, getCategories, images, placeholder } from "@/lib/catalog";
 import { getCustomer } from "@/lib/customer-auth";
-import { ArrowRight, ChevronDown, PackageSearch, User } from "lucide-react";
+import { PackageSearch, User } from "lucide-react";
 import { CartButton } from "./CartDrawer";
 import MobileMenu from "./MobileMenu";
 import SearchBox from "./SearchBox";
 import ThemeToggle from "./ThemeToggle";
+import HeaderShell from "./HeaderShell";
+import { MegaMenu, NavLink } from "./HeaderNav";
 import { WishlistLink } from "./wishlist";
 import { WhatsAppIcon } from "./social";
+
+const iconBtn = "hidden h-10 w-10 items-center justify-center rounded-full transition hover:bg-lilac/70";
 
 export default async function Header() {
   const [s, cats, feat, me] = await Promise.all([
     getSettings(),
     getCategories(),
-    all(`select id, name, slug, images, category_id from products where status='published' order by featured desc, id desc limit 80`),
+    all(`select id, name, slug, images, category_id, type, price, sale_price,
+           (select min(coalesce(v.sale_price, v.price)) from variants v where v.product_id = products.id) as vmin
+         from products where status='published' order by featured desc, id desc limit 120`),
     getCustomer(),
   ]);
   const f = {
     combos: s.combos_enabled === "1", sale: s.sale_enabled === "1", track: s.track_enabled === "1", accounts: s.accounts_enabled === "1",
     wishlist: s.wishlist_enabled === "1", theme: s.theme_toggle_enabled === "1", search: s.search_enabled === "1", blog: s.blog_enabled === "1",
   };
-  const by = (cid: number) => feat.filter((p: any) => p.category_id === cid).slice(0, 3);
-  const img = (p: any) => { try { return JSON.parse(p.images)[0] || placeholder(p.name); } catch { return placeholder(p.name); } };
+  const mega = cats.map((c: any) => ({
+    id: c.id, name: c.name, slug: c.slug, description: c.description || "", count: c.product_count ?? 0, image: c.image || placeholder(c.name),
+    products: feat.filter((p: any) => p.category_id === c.id).slice(0, 4).map((p: any) => {
+      const variable = p.type === "variable";
+      return { id: p.id, name: p.name, slug: p.slug, image: images(p)[0], from: variable, price: variable ? Number(p.vmin ?? 0) : Number(p.sale_price || p.price) };
+    }),
+  }));
+  const quick = mega.filter((c: any) => c.count > 0).slice(0, 3);
+
+  const announcement = s.announcement_enabled === "1" ? (
+    <div className="bg-lilac px-4 py-2 text-center text-[11.5px] leading-snug text-ink sm:text-xs">
+      <span>{s.announcement}</span>
+      {s.whatsapp && <a href={`https://wa.me/${s.whatsapp}`} target="_blank" className="ml-3 hidden whitespace-nowrap font-medium underline underline-offset-2 sm:inline"><WhatsAppIcon size={13} className="mr-1 inline" />Bulk Order Enquiries</a>}
+    </div>
+  ) : null;
 
   return (
-    <header className="sticky top-0 z-40 border-b border-neutral-200 bg-paper/95 backdrop-blur">
-      {s.announcement_enabled === "1" && (
-        <div className="bg-lilac px-4 py-2 text-center text-xs text-ink">
-          {s.announcement}{" "}
-          <a href={`https://wa.me/${s.whatsapp}`} target="_blank" className="ml-2 underline underline-offset-2"><WhatsAppIcon size={13} className="mr-1 inline" />Bulk Order Enquiries</a>
-        </div>
-      )}
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <MobileMenu cats={cats.map((c: any) => ({ name: c.name, slug: c.slug }))} flags={f} />
-        <Link href="/" className="h-serif flex items-center text-2xl font-semibold tracking-tight">
+    <HeaderShell announcement={announcement}>
+      <div className="mx-auto grid h-16 max-w-7xl grid-cols-[1fr_auto_1fr] items-center gap-3 px-3 sm:px-6 lg:h-[72px] lg:grid-cols-[auto_1fr_auto] lg:gap-6">
+        <div className="justify-self-start lg:hidden"><MobileMenu cats={mega.map((c: any) => ({ name: c.name, slug: c.slug, image: c.image }))} flags={f} whatsapp={s.whatsapp} storeName={s.store_name} /></div>
+
+        <Link href="/" aria-label={s.store_name} className="h-serif flex items-center justify-self-center text-[22px] font-semibold tracking-tight sm:text-2xl lg:justify-self-start">
           {s.logo_url ? <img src={s.logo_url} alt={s.store_name} className="h-8 w-auto max-w-[150px] object-contain sm:h-9" /> : s.store_name}
         </Link>
-        <nav className="hidden min-w-0 items-center gap-3 lg:flex xl:gap-5">
-          {cats.slice(0, 7).map((c: any) => (
-            <div key={c.id} className="group static">
-              <Link href={`/category/${c.slug}`} className="inline-flex items-center gap-1 whitespace-nowrap py-6 text-[13px] font-medium hover:text-clay xl:text-sm">{c.name}<ChevronDown size={14} className="opacity-50 transition group-hover:rotate-180" /></Link>
-              <div className="invisible absolute left-0 right-0 top-full translate-y-2 border-b border-neutral-200 bg-paper opacity-0 shadow-lg transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
-                <div className="mx-auto grid max-w-7xl grid-cols-4 gap-6 px-6 py-6">
-                  <div>
-                    <p className="eyebrow">{c.name}</p>
-                    <p className="mt-2 text-sm text-neutral-600">{c.description}</p>
-                    <Link href={`/category/${c.slug}`} className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium underline">Shop all {c.name} <ArrowRight size={14} /></Link>
-                  </div>
-                  {by(c.id).map((p: any) => (
-                    <Link key={p.id} href={`/product/${p.slug}`} className="block">
-                      <img src={img(p)} alt="" className="aspect-[4/3] w-full rounded-lg object-cover" />
-                      <p className="mt-2 text-sm font-medium">{p.name}</p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-          {f.combos && <Link href="/combos" className="text-sm font-medium hover:text-clay">Combos</Link>}
-          {f.sale && <Link href="/sale" className="text-sm font-medium text-clay">Sale</Link>}
-          {s.blog_enabled === "1" && <Link href="/blog" className="text-sm font-medium hover:text-clay">Blog</Link>}
+
+        <nav aria-label="Main" className="hidden h-full items-center justify-center gap-0.5 lg:flex">
+          <MegaMenu cats={mega} />
+          {quick.map((c: any) => <span key={c.id} className="hidden xl:block"><NavLink href={`/category/${c.slug}`}>{c.name}</NavLink></span>)}
+          {f.combos && <NavLink href="/combos">Combos</NavLink>}
+          {f.sale && <NavLink href="/sale" tone="sale">Sale</NavLink>}
+          {f.blog && <NavLink href="/blog">Journal</NavLink>}
         </nav>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {f.search && <SearchBox />}
-          {f.track && <Link href="/track" aria-label="Track order" title="Track order" className="hidden h-9 w-9 items-center justify-center rounded-full transition hover:bg-black/5 dark:hover:bg-white/10 sm:flex"><PackageSearch size={19} /></Link>}
-          {f.wishlist && <WishlistLink />}
-          {f.accounts && <Link href={me ? "/account" : "/account/login"} aria-label="Account" title={me ? me.name : "Sign in"} className="hidden h-9 w-9 items-center justify-center rounded-full transition hover:bg-black/5 dark:hover:bg-white/10 sm:flex"><User size={19} className={me ? "text-plum" : ""} /></Link>}
+
+        <div className="flex items-center gap-0.5 justify-self-end sm:gap-1">
+          {f.search && <SearchBox cats={mega.map((c: any) => ({ name: c.name, slug: c.slug }))} />}
+          {f.track && <Link href="/track" aria-label="Track order" title="Track order" className={`${iconBtn} xl:flex`}><PackageSearch size={19} /></Link>}
+          {f.wishlist && <span className="hidden sm:block"><WishlistLink /></span>}
+          {f.accounts && <Link href={me ? "/account" : "/account/login"} aria-label="Account" title={me ? me.name : "Sign in"} className={`${iconBtn} sm:flex`}><User size={19} className={me ? "text-plum" : ""} /></Link>}
           {f.theme && <span className="hidden sm:block"><ThemeToggle /></span>}
-          <CartButton />
+          <span className="ml-1"><CartButton /></span>
         </div>
       </div>
-    </header>
+    </HeaderShell>
   );
 }

@@ -33,7 +33,7 @@ export function HeartButton({ id, className = "" }: { id: number; className?: st
 export function WishlistLink() {
   const { ids } = useWishlist();
   return (
-    <Link href="/wishlist" aria-label="Wishlist" className="relative flex h-9 w-9 items-center justify-center rounded-full transition hover:bg-black/5 dark:hover:bg-white/10">
+    <Link href="/wishlist" aria-label="Wishlist" className="relative flex h-10 w-10 items-center justify-center rounded-full transition hover:bg-lilac/70">
       <Heart size={19} />
       {ids.length > 0 && <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-clay px-1 text-[10px] text-white">{ids.length}</span>}
     </Link>

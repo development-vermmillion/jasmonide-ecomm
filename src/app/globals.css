@@ -140,3 +140,34 @@ body { overflow-x: clip; background: rgb(var(--c-paper)); color: rgb(var(--c-ink
 .slide-in { animation: adm-slide .38s cubic-bezier(.2,.8,.2,1) both; }
 .tip-in { animation: adm-tip .16s ease both; }
 @media (prefers-reduced-motion: reduce) { .adm-page > * > *, .rise, .draw, .fade-in, .bar-in, .pop, .slide-in, .tip-in { animation: none !important; stroke-dashoffset: 0 !important; opacity: 1 !important; } }
+
+
+/* =====================================================================
+   STOREFRONT MOTION
+   ===================================================================== */
+@keyframes sf-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sf-sheet { from { transform: translateY(-100%); } to { transform: none; } }
+@keyframes sf-bump { 0% { transform: scale(.4); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+@keyframes sf-kb { from { transform: scale(1.02); } to { transform: scale(1.12) translate(-1.5%, -1%); } }
+@keyframes sf-up { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes sf-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes sf-shine { from { transform: translateX(-120%) skewX(-18deg); } to { transform: translateX(260%) skewX(-18deg); } }
+.sf-fade { animation: sf-fade .25s ease both; }
+.sheet-down { animation: sf-sheet .4s cubic-bezier(.2,.8,.2,1) both; }
+.bump { animation: sf-bump .4s cubic-bezier(.3,1.4,.5,1); }
+.kenburns { animation: sf-kb 24s ease-in-out infinite alternate; will-change: transform; }
+.hero-in { animation: sf-up .9s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 130ms + 250ms); }
+.page-in { animation: sf-fade .45s ease both; }
+.rv-item { animation: sf-up .7s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+.reveal:not(.in) .rv-item { animation: none; opacity: 0; }
+.float-slow { animation: sf-float 5s ease-in-out infinite; }
+.nav-link::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 5px; height: 2px; border-radius: 2px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+.nav-link.is-active::after { transform: scaleX(1); }
+.pcard { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+@media (hover: hover) { .pcard:hover { transform: translateY(-3px); } }
+.shine { position: relative; overflow: hidden; }
+.shine::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 40%; background: linear-gradient(90deg, transparent, rgb(255 255 255 / .35), transparent); transform: translateX(-120%) skewX(-18deg); }
+.shine:hover::after { animation: sf-shine .8s ease; }
+.sf-lift { transition: transform .4s cubic-bezier(.2,.7,.2,1), box-shadow .4s; }
+@media (hover: hover) { .sf-lift:hover { transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .kenburns, .hero-in, .page-in, .rv-item, .float-slow, .sheet-down, .sf-fade, .bump, .shine::after { animation: none !important; opacity: 1 !important; transform: none !important; } .pcard, .sf-lift { transition: none; } .pcard:hover, .sf-lift:hover { transform: none; } }

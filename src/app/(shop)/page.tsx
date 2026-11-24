@@ -37,19 +37,19 @@ export default async function Home() {
     <>
       <section className="mx-auto grid max-w-7xl gap-4 px-4 pt-4 sm:px-6 sm:pt-6 lg:grid-cols-3">
         <Link href={s.hero_link || "/shop"} className="group relative overflow-hidden rounded-2xl lg:col-span-2">
-          <img src={s.hero_image || placeholder("Hero banner", 25)} alt={s.hero_title} className="h-[380px] w-full object-cover transition duration-700 group-hover:scale-105 sm:h-[460px]" />
+          <img src={s.hero_image || placeholder("Hero banner", 25)} alt={s.hero_title} className="kenburns h-[380px] w-full object-cover sm:h-[460px]" />
           <div className="absolute inset-0 bg-[#2d2550]/45" />
           <div className="absolute bottom-0 left-0 max-w-lg p-5 text-white sm:p-10">
-            {s.hero_eyebrow && <p className="text-[11px] font-semibold uppercase tracking-[0.25em] opacity-80">{s.hero_eyebrow}</p>}
-            <h1 className="h-serif mt-2 text-3xl leading-tight sm:text-5xl">{s.hero_title}</h1>
-            <p className="mt-3 text-sm opacity-90 sm:text-base">{s.hero_text}</p>
-            {s.hero_cta && <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-medium text-ink">{s.hero_cta} <ArrowRight size={16} /></span>}
+            {s.hero_eyebrow && <p style={{ ["--i" as any]: 0 }} className="hero-in text-[11px] font-semibold uppercase tracking-[0.25em] opacity-80">{s.hero_eyebrow}</p>}
+            <h1 style={{ ["--i" as any]: 1 }} className="hero-in h-serif mt-2 text-3xl leading-tight sm:text-5xl">{s.hero_title}</h1>
+            <p style={{ ["--i" as any]: 2 }} className="hero-in mt-3 text-sm opacity-90 sm:text-base">{s.hero_text}</p>
+            {s.hero_cta && <span style={{ ["--i" as any]: 3 }} className="hero-in shine mt-5 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-medium text-ink transition group-hover:gap-3">{s.hero_cta} <ArrowRight size={16} /></span>}
           </div>
         </Link>
         {tiles.length > 0 && <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-1">
           {tiles.map((t, i) => (
             <Link key={t.t} href={t.h || "/shop"} className="group relative overflow-hidden rounded-2xl">
-              <img src={t.img || placeholder(t.t, t.hue)} alt="" className="h-[150px] w-full object-cover transition duration-700 group-hover:scale-105 sm:h-[222px]" />
+              <img src={t.img || placeholder(t.t, t.hue)} alt="" className="h-[150px] w-full object-cover transition duration-[900ms] ease-out group-hover:scale-110 sm:h-[222px]" />
               <div className="absolute inset-0 bg-[#2d2550]/40" />
               <div className="absolute bottom-0 p-3 text-white sm:p-5"><p className="hidden text-[10px] font-semibold uppercase tracking-[0.25em] opacity-80 sm:block">0{i + 2}</p><h3 className="h-serif text-lg sm:text-2xl">{t.t}</h3><p className="text-xs opacity-90 sm:text-sm">{t.d}</p></div>
             </Link>
@@ -61,7 +61,7 @@ export default async function Home() {
         <Reveal><section className="mx-auto max-w-7xl px-4 pt-6 sm:px-6">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {usp.map(([t, d], i) => { const Icon = USP[i]; return (
-              <div key={i} className={`flex items-center gap-3 rounded-xl p-3 sm:p-4 ${USP_TONE[i]}`}>
+              <div key={i} style={{ ["--i" as any]: i }} className={`rv-item sf-lift flex items-center gap-3 rounded-xl p-3 sm:p-4 ${USP_TONE[i]}`}>
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-plum"><Icon size={20} /></span>
                 <div className="min-w-0"><p className="text-sm font-semibold">{t}</p><p className="text-xs text-neutral-600">{d}</p></div>
               </div>); })}
@@ -74,8 +74,8 @@ export default async function Home() {
           <p className="eyebrow">{s.cat_eyebrow}</p><h2 className="h-serif mt-1 text-2xl sm:text-3xl">{s.cat_title}</h2>
           <div className="no-scrollbar -mx-4 mt-3 flex scroll-pl-4 gap-4 overflow-x-auto px-4 pb-2 pt-2 sm:mx-0 sm:px-1">
             {cats.map((c: any, i: number) => (
-              <Link key={c.id} href={`/category/${c.slug}`} className="group w-28 shrink-0 text-center sm:w-44">
-                <img src={c.image || placeholder(c.name)} alt={c.name} className={`aspect-square w-full rounded-full object-cover ring-4 ${RING[i % 6]} transition group-hover:scale-[1.03]`} />
+              <Link key={c.id} href={`/category/${c.slug}`} style={{ ["--i" as any]: i }} className="rv-item group w-28 shrink-0 text-center sm:w-44">
+                <img src={c.image || placeholder(c.name)} alt={c.name} className={`aspect-square w-full rounded-full object-cover ring-4 ${RING[i % 6]} transition duration-500 group-hover:-translate-y-1 group-hover:scale-[1.04] group-hover:ring-8`} />
                 <p className="mt-3 text-sm font-medium">{c.name}</p>
               </Link>
             ))}
@@ -97,8 +97,8 @@ export default async function Home() {
           <p className="eyebrow">{s.proj_eyebrow}</p><h2 className="h-serif mt-1 text-2xl sm:text-3xl">{s.proj_title}</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-3">
             {projects.map((p, i) => (
-              <Link href={p.h} key={i} className={`group overflow-hidden rounded-xl border border-white ${["bg-sky/60", "bg-blush/60", "bg-mint/60"][i % 3]}`}>
-                <img src={p.img || placeholder(p.t, 40 + i * 90)} alt={p.t} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+              <Link href={p.h} key={i} className={`sf-lift group overflow-hidden rounded-xl border border-white ${["bg-sky/60", "bg-blush/60", "bg-mint/60"][i % 3]}`}>
+                <span className="block overflow-hidden"><img src={p.img || placeholder(p.t, 40 + i * 90)} alt={p.t} loading="lazy" className="aspect-[4/3] w-full object-cover transition duration-700 group-hover:scale-105" /></span>
                 <div className="p-4"><p className="font-medium">{p.t}</p><p className="mt-2 inline-flex items-center gap-1.5 text-sm underline">Explore <ArrowRight size={14} /></p></div>
               </Link>
             ))}
@@ -109,7 +109,7 @@ export default async function Home() {
       {posts.length > 0 && (
         <Reveal><section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
           <div className="mb-5 flex items-end justify-between"><div><p className="eyebrow">Journal</p><h2 className="h-serif mt-1 text-2xl sm:text-3xl">Latest from the blog</h2></div><Link href="/blog" className="rounded-full bg-white/70 px-4 py-1.5 text-sm font-medium">All posts</Link></div>
-          <div className="grid gap-4 sm:grid-cols-3">{posts.map((p: any) => <Link key={p.slug} href={`/blog/${p.slug}`} className="group"><img src={p.cover || placeholder(p.title)} alt="" loading="lazy" className="aspect-[16/10] w-full rounded-xl object-cover" /><p className="mt-2 text-xs text-neutral-500">{fdate(p.created_at)}</p><p className="font-medium group-hover:underline">{p.title}</p></Link>)}</div>
+          <div className="grid gap-4 sm:grid-cols-3">{posts.map((p: any) => <Link key={p.slug} href={`/blog/${p.slug}`} className="group"><span className="block overflow-hidden rounded-xl"><img src={p.cover || placeholder(p.title)} alt="" loading="lazy" className="aspect-[16/10] w-full object-cover transition duration-700 group-hover:scale-105" /></span><p className="mt-2 text-xs text-neutral-500">{fdate(p.created_at)}</p><p className="font-medium group-hover:underline">{p.title}</p></Link>)}</div>
         </section></Reveal>
       )}
 

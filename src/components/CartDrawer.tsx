@@ -8,9 +8,9 @@ import { inr } from "@/lib/util";
 export function CartButton() {
   const { count, setOpen } = useCart();
   return (
-    <button onClick={() => setOpen(true)} className="relative flex items-center gap-1.5 text-sm font-medium hover:text-clay" aria-label="Open bag">
-      <ShoppingBag size={20} /><span className="hidden sm:inline">Bag</span>
-      {count > 0 && <span className="absolute -right-2.5 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-clay px-1 text-[10px] text-white sm:static sm:ml-0.5 sm:h-auto sm:min-w-0 sm:py-0.5">{count}</span>}
+    <button onClick={() => setOpen(true)} aria-label="Open bag" className="group relative flex h-10 items-center gap-2 rounded-full transition hover:bg-lilac/70 max-sm:w-10 max-sm:justify-center sm:border sm:border-neutral-300 sm:pl-3.5 sm:pr-4 sm:hover:border-plum">
+      <ShoppingBag size={19} className="transition-transform group-hover:-rotate-6" /><span className="hidden text-[13.5px] font-medium sm:inline">Bag</span>
+      {count > 0 && <span key={count} className="bump absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-clay px-1 text-[10px] font-semibold text-white sm:static sm:h-5 sm:min-w-5">{count}</span>}
     </button>
   );
 }
